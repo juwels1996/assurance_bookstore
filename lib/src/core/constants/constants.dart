@@ -1,3 +1,3 @@
-Constants{
-  static const String baseUrl = 'http://127.0.0.1:8000/api/';
+class Constants {
+  static const String baseUrl = 'http://192.168.68.103:8000/api/';
 }

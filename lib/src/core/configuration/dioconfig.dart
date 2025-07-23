@@ -1,23 +1,17 @@
 import 'package:dio/dio.dart';
-import 'package:book_store/src/core/constants/constants.dart';
-class DioConfig {}
-static DioConfig? _instance;
+import '../constants/constants.dart';
 
-  DioConfig._internal();
+class DioConfig {
+  static final DioConfig _instance = DioConfig._internal();
 
   factory DioConfig() {
-    if (_instance == null) {
-      _instance = DioConfig._internal();
-    }
-    return _instance!;
+    return _instance;
   }
+
   late final Dio _dio;
-  Dio get dio => _dio;
-  set dio(Dio value) {
-    _dio = value;
-  }
-  init(){
-    dio = Dio(
+
+  DioConfig._internal() {
+    _dio = Dio(
       BaseOptions(
         baseUrl: Constants.baseUrl,
         connectTimeout: const Duration(seconds: 30),
@@ -30,6 +24,5 @@ static DioConfig? _instance;
     );
   }
 
-
-  // Add your configuration methods and properties here
+  Dio get dio => _dio;
 }
