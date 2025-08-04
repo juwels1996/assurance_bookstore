@@ -1,12 +1,15 @@
 import 'package:assurance_bookstore/src/core/helper/extension.dart';
+import 'package:assurance_bookstore/src/ui/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/constants/constants.dart';
 import '../../../core/controllers/home/home_controller.dart';
 import '../../../core/models/home/home_page_data.dart';
 import '../../widgets/custom_appbar.dart';
 import '../book-details/book-details_Screen.dart';
+import 'components/book_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -67,7 +70,9 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
           // LEFT Sidebar
           Container(
             height: MediaQuery.of(context).size.height * 0.90,
-            width: MediaQuery.of(context).size.width * 0.25,
+            width: Responsive.isSmallScreen(context)
+                ? MediaQuery.of(context).size.width * 0.35
+                : MediaQuery.of(context).size.width * 0.15,
             color: Colors.grey.shade100,
             child: ListView(
               padding: EdgeInsets.zero,
@@ -94,13 +99,21 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                       curve: Curves.easeOut,
                       duration: Duration(milliseconds: 500),
                     ),
-                    title: Text(
-                      category.name,
-                      style: context.labelMedium!.copyWith(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
+                    title: SizedBox(
+                      width: Responsive.isSmallScreen(context) ? 120 : 180,
+                      child: Text(
+                        category.name,
+                        style: context.labelMedium!.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
+                        maxLines: 1,
                       ),
+                    ),
+                    trailing: Icon(
+                      Icons.arrow_drop_down_sharp,
+                      color: Colors.grey,
                     ),
                     children: category.subcategories.map((sub) {
                       return ListTile(
@@ -116,10 +129,6 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                         },
                       );
                     }).toList(),
-                    trailing: Icon(
-                      Icons.arrow_drop_down_sharp,
-                      color: Colors.grey,
-                    ),
                   );
                 }).toList(),
               ],
@@ -136,7 +145,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: SizedBox(
-                        height: 300,
+                        height: Responsive.isSmallScreen(context) ? 200 : 300,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: homeController.banners.length,
@@ -157,12 +166,19 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
                                     child: Image.network(
-                                      "http://192.168.68.103:8000/${banner.image}",
-                                      width:
-                                          MediaQuery.of(context).size.width *
-                                          0.6,
+                                      Constants.imageUrl + banner.image,
+                                      width: Responsive.isSmallScreen(context)
+                                          ? MediaQuery.of(context).size.width *
+                                                0.6
+                                          : MediaQuery.of(context).size.width *
+                                                0.7,
+                                      height: Responsive.isSmallScreen(context)
+                                          ? MediaQuery.of(context).size.width *
+                                                0.3
+                                          : MediaQuery.of(context).size.width *
+                                                0.3,
 
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.fill,
                                     ),
                                   ),
                                 ),
@@ -188,7 +204,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                             Padding(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 16.0,
-                                vertical: 10,
+                                vertical: 0,
                               ),
                               child: Row(
                                 mainAxisAlignment:
@@ -197,7 +213,10 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                   Text(
                                     category.name,
                                     style: context.labelLarge!.copyWith(
-                                      fontSize: 18,
+                                      fontSize:
+                                          Responsive.isSmallScreen(context)
+                                          ? 14
+                                          : 18,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -215,6 +234,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                 ],
                               ),
                             ),
+                            Divider(),
                             // Subcategories loop
                             ...category.subcategories.map((sub) {
                               return Column(
@@ -224,26 +244,31 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                     Padding(
                                       padding: const EdgeInsets.only(
                                         left: 16.0,
-                                        bottom: 6,
+                                        bottom: 2,
                                       ),
                                       child: Text(
                                         sub.name,
                                         style: context.labelLarge!.copyWith(
                                           color: Colors.redAccent,
-                                          fontSize: 14,
+                                          fontSize:
+                                              Responsive.isSmallScreen(context)
+                                              ? 12
+                                              : 14,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ),
                                   SizedBox(height: 5),
                                   SizedBox(
-                                    height: 300,
+                                    height: Responsive.isSmallScreen(context)
+                                        ? 200
+                                        : 300,
                                     child: ListView.builder(
                                       scrollDirection: Axis.horizontal,
                                       itemCount: sub.books.length,
                                       itemBuilder: (context, bookIndex) {
-                                        return buildBookCard(
-                                          sub.books[bookIndex],
+                                        return BookCard(
+                                          book: sub.books[bookIndex],
                                         );
                                       },
                                     ),

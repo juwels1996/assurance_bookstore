@@ -1,3 +1,6 @@
+import 'package:assurance_bookstore/src/core/controllers/auth/auth_controller.dart';
+import 'package:assurance_bookstore/src/core/controllers/cart-controller/cart_controller.dart';
+import 'package:assurance_bookstore/src/core/controllers/checkout-controller/checkout_controller.dart';
 import 'package:assurance_bookstore/src/core/controllers/home/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,6 +9,10 @@ import 'src/ui/screen/home/home_page.dart';
 
 void main() {
   Get.put(HomeController());
+  Get.put(CartController());
+  Get.put(AuthController());
+  Get.put(CheckoutController());
+
   runApp(const MyApp());
 }
 
