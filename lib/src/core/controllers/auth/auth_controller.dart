@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../../../ui/screen/cart-screen/cart_screen.dart';
 import '../../config/dio_exception.dart';
 import '../../constants/constants.dart';
 import '../../utils/functions.dart';
@@ -11,13 +11,12 @@ import '../../utils/functions.dart';
 class AuthController extends GetxController {
   var isAuthenticated = false.obs;
   var token = ''.obs;
-  final storage = GetStorage(); // Optional if you want to keep using it
+  var username = ''.obs;
 
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  final phoneController = TextEditingController();
 
   @override
   void onInit() {
@@ -35,21 +34,20 @@ class AuthController extends GetxController {
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': email, 'password': password}),
       );
+      print("-------------->>>>>");
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final accessToken = data['access'] ?? data['token'];
+        print("------------------------${data}");
+        final accessToken = data['access'];
 
-        // Save in shared_preferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', accessToken);
         await prefs.setString('email', email);
 
-        // Optional: Also store in GetStorage
-        storage.write('access_token', accessToken);
-
-        isAuthenticated.value = true;
+        username.value = email.split('@')[0]; // Extracting username from email
         token.value = accessToken;
+        isAuthenticated.value = true;
 
         return true;
       } else {
@@ -65,42 +63,39 @@ class AuthController extends GetxController {
   // ✅ SIGN UP
   Future<bool> signup({
     required String email,
-    required String username,
+    required String username1,
     required String password1,
     required String password2,
   }) async {
     try {
       final response = await http.post(
         Uri.parse(Constants.baseUrl + 'auth/registration/'),
-        headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': email,
-          'username': username,
+          'username': username1,
           'password1': password1,
           'password2': password2,
         }),
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 201) {
-        final data = json.decode(response.body);
-        final accessToken = data['access'];
-        final refreshToken = data['refresh'];
-
-        // Save in shared_preferences
+        var data = json.decode(response.body);
+        String accessToken = data['access']; // Access token
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', accessToken);
-        await prefs.setString('refresh_token', refreshToken);
-        await prefs.setString('email', email);
-        await prefs.setString('username', username);
 
-        storage.write('access_token', accessToken);
+        prefs.setString('access_token', accessToken);
 
-        isAuthenticated.value = true;
+        username.value = email.split('@')[0]; // Extract username from email
         token.value = accessToken;
+        isAuthenticated.value = true;
+
+        // Navigate to the cart screen after signup
+        Get.to(() => CartScreen());
 
         return true;
       } else {
-        showMassage("Sign-up failed");
+        showMassage('Sign-up failed. Please check your details.');
         return false;
       }
     } catch (e) {
@@ -116,8 +111,6 @@ class AuthController extends GetxController {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // remove all
-
-    storage.erase(); // optional
   }
 
   // ✅ AUTO LOGIN CHECK
@@ -128,9 +121,7 @@ class AuthController extends GetxController {
     if (savedToken != null && savedToken.isNotEmpty) {
       token.value = savedToken;
       isAuthenticated.value = true;
-    } else {
-      token.value = '';
-      isAuthenticated.value = false;
+      username.value = prefs.getString('email')?.split('@')[0] ?? '';
     }
   }
 }
