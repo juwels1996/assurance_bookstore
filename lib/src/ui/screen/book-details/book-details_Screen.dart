@@ -296,39 +296,39 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                       ),
                     ),
                     SizedBox(width: 15),
-                    GestureDetector(
-                      onTap: () {
-                        Get.to(
-                          () => BookPdfPreviewScreen(
-                            pdfUrl:
-                                "https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf",
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Row(
-                            children: [
-                              Text(
-                                'একটু পড়ে দেখুন',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
 
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     Get.to(
+                    //       () => BookPdfPreviewScreen(
+                    //         pdfUrl:
+                    //             "https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf",
+                    //       ),
+                    //     );
+                    //   },
+                    //   child: Container(
+                    //     padding: const EdgeInsets.symmetric(vertical: 4),
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.red,
+                    //       borderRadius: BorderRadius.circular(6),
+                    //     ),
+                    //     alignment: Alignment.center,
+                    //     child: const Padding(
+                    //       padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    //       child: Row(
+                    //         children: [
+                    //           Text(
+                    //             'একটু পড়ে দেখুন',
+                    //             style: TextStyle(
+                    //               color: Colors.white,
+                    //               fontWeight: FontWeight.bold,
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     GestureDetector(
                       onTap: () {
                         Get.to(

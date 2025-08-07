@@ -22,6 +22,8 @@ class BookDetailsController extends GetxController {
 
       if (response.statusCode == 200 && response.data != null) {
         bookDetails.value = BookDetail.fromJson(response.data);
+
+        print("book details--------${response.data}");
       } else {
         errorMessage.value = 'Failed to load book details.';
       }

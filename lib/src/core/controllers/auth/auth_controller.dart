@@ -27,31 +27,39 @@ class AuthController extends GetxController {
   bool get isLoggedIn => isAuthenticated.value;
 
   // ✅ LOGIN
+
   Future<bool> loginWithEmail(String email, String password) async {
     try {
+      // Check if the email or password is null or empty
+      if (email.isEmpty || password.isEmpty) {
+        Get.snackbar('Error', 'Please enter both email and password');
+        return false;
+      }
+
       final response = await http.post(
         Uri.parse(Constants.baseUrl + 'auth/login/'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': email, 'password': password}),
       );
-      print("-------------->>>>>");
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print("------------------------${data}");
-        final accessToken = data['access'];
+        final accessToken = data['access'] ?? data['token'];
 
+        // Save the token and email in shared preferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', accessToken);
         await prefs.setString('email', email);
 
-        username.value = email.split('@')[0]; // Extracting username from email
-        token.value = accessToken;
+        // Store the token and set isAuthenticated to true
+        prefs.setString('access_token', accessToken);
+
         isAuthenticated.value = true;
+        token.value = accessToken;
 
         return true;
       } else {
-        showMassage("Login failed");
+        Get.snackbar("Error", "Invalid credentials");
         return false;
       }
     } catch (e) {
@@ -108,20 +116,26 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     isAuthenticated.value = false;
     token.value = '';
+    username.value = ''; // Reset username
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // remove all
+    await prefs.clear(); // Clear stored preferences
+    // Optional: If using GetStorage
   }
 
   // ✅ AUTO LOGIN CHECK
   void checkAuthStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final savedToken = prefs.getString('token');
+    final savedUsername = prefs.getString('username'); // Retrieve username
 
     if (savedToken != null && savedToken.isNotEmpty) {
       token.value = savedToken;
       isAuthenticated.value = true;
-      username.value = prefs.getString('email')?.split('@')[0] ?? '';
+      username.value = savedUsername ?? ''; // Update the username if available
+    } else {
+      token.value = '';
+      isAuthenticated.value = false;
     }
   }
 }

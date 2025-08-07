@@ -1,3 +1,4 @@
+import 'package:assurance_bookstore/src/core/controllers/auth/auth_controller.dart';
 import 'package:assurance_bookstore/src/core/helper/extension.dart';
 import 'package:assurance_bookstore/src/ui/widgets/responsive.dart';
 import 'package:flutter/material.dart';
@@ -61,13 +62,33 @@ class _HomePageState extends State<HomePage> {
 }
 
 Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
+  final authController = Get.find<AuthController>();
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // LEFT Sidebar
+          Obx(() {
+            if (authController.isLoggedIn) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.account_circle, color: Colors.black),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Hello, ${authController.emailController.text.split('@')[0]}', // Display the first part of the email as username
+                      style: TextStyle(color: Colors.black, fontSize: 16),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return Container();
+            }
+          }),
+          SizedBox(height: 20),
           Container(
             height: MediaQuery.of(context).size.height * 0.90,
             width: Responsive.isSmallScreen(context)

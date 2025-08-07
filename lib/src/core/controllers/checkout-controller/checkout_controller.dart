@@ -1,4 +1,5 @@
 import 'package:assurance_bookstore/src/core/controllers/auth/auth_controller.dart';
+import 'package:assurance_bookstore/src/ui/screen/bkash-payment/bkash_payment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -32,7 +33,7 @@ class CheckoutController extends GetxController {
 
     if (response.statusCode == 201) {
       Get.snackbar('Success', 'Delivery info saved!');
-      // Proceed to next screen
+      Get.to(PaymentScreen());
     } else {
       print("ERROR BODY: ${response.body}");
       showMassage('Failed to save delivery info.');

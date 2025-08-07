@@ -1,4 +1,10 @@
+import 'package:assurance_bookstore/src/ui/screen/home/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+
+import '../../core/controllers/auth/auth_controller.dart';
+import '../screen/auth/login_screen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -6,6 +12,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authController = Get.find<AuthController>();
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 1,
@@ -79,28 +86,64 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                       onPressed: () {},
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.person, color: Colors.black),
-                      onPressed: () {},
-                    ),
                   ],
                 ),
-
-                // Phone number button
-                TextButton.icon(
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.grey[300],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                if (authController.isLoggedIn)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.account_circle, color: Colors.black),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.home, color: Colors.black),
+                          onPressed: () {
+                            Get.to(() => HomePage()); // Navigate to Home Screen
+                          },
+                        ),
+                        Text(
+                          'Hello, ${authController.emailController.text.split('@')[0]}', // Display the first part of the email as username
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.logout, color: Colors.black),
+                          onPressed: () async {
+                            await authController.logout();
+                            Get.snackbar(
+                              "Logged Out",
+                              "You have successfully logged out.",
+                              backgroundColor: Colors.green.shade100,
+                            );
+                            Get.offAll(() => LoginScreen());
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                  onPressed: () {},
-                  icon: const Icon(Icons.phone, color: Colors.black),
-                  label: const Text(
-                    "01323-112233",
-                    style: TextStyle(color: Colors.black),
+                // If not logged in, show the login button
+                if (!authController.isLoggedIn)
+                  IconButton(
+                    icon: const Icon(Icons.login, color: Colors.black),
+                    onPressed: () {
+                      Get.to(() => LoginScreen());
+                    },
                   ),
-                ),
+                // Phone number button
+                // TextButton.icon(
+                //   style: TextButton.styleFrom(
+                //     backgroundColor: Colors.grey[300],
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(8),
+                //     ),
+                //   ),
+                //   onPressed: () {},
+                //   icon: const Icon(Icons.phone, color: Colors.black),
+                //   label: const Text(
+                //     "01323-112233",
+                //     style: TextStyle(color: Colors.black),
+                //   ),
+                // ),
               ],
             ),
             SizedBox(height: 8),

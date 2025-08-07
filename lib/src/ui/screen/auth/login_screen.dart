@@ -104,6 +104,14 @@ class _LoginScreenState extends State<LoginScreen> {
               // Button for SignUp or Login
               ElevatedButton(
                 onPressed: () async {
+                  if (authController.emailController.text.isEmpty ||
+                      authController.passwordController.text.isEmpty) {
+                    Get.snackbar(
+                      'Error',
+                      'Please enter both email and password',
+                    );
+                    return;
+                  }
                   if (isSignup) {
                     // Sign Up Flow
                     if (authController.passwordController.text !=

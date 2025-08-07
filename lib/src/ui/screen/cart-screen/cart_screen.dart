@@ -1,8 +1,17 @@
 import 'package:assurance_bookstore/src/ui/screen/cart-screen/checkout_screen.dart';
+import 'package:assurance_bookstore/src/ui/screen/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/constants/constants.dart';
+import '../../../core/controllers/auth/auth_controller.dart';
+import '../../../core/controllers/cart-controller/cart_controller.dart';
+import '../auth/login_screen.dart';
+import '../delivery-address/delivery_address_screen.dart';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 import '../../../core/controllers/auth/auth_controller.dart';
 import '../../../core/controllers/cart-controller/cart_controller.dart';
 import '../auth/login_screen.dart';
@@ -13,8 +22,45 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authController = Get.find<AuthController>(); // Get the AuthController
+
     return Scaffold(
-      appBar: AppBar(title: const Text("My Cart")),
+      appBar: AppBar(
+        title: const Text("My Cart"),
+        actions: [
+          // If user is logged in, show username or email, otherwise show login button
+          Obx(() {
+            if (authController.isLoggedIn) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.home, color: Colors.black),
+                      onPressed: () {
+                        Get.to(() => HomePage()); // Navigate to Home Screen
+                      },
+                    ),
+                    Icon(Icons.account_circle, color: Colors.black),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Hello, ${authController.emailController.text.split('@')[0]}', // Display the first part of the email as username
+                      style: const TextStyle(color: Colors.black),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return IconButton(
+                icon: const Icon(Icons.login),
+                onPressed: () {
+                  Get.to(() => LoginScreen()); // Navigate to login screen
+                },
+              );
+            }
+          }),
+        ],
+      ),
       body: Obx(() {
         final items = cartController.cartItems;
         final total = cartController.totalAmount;
@@ -167,14 +213,20 @@ class CartScreen extends StatelessWidget {
                     children: [Text("VAT"), Text("0 Tk")],
                   ),
                   const SizedBox(height: 4),
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Text("Delivery Charge"), Text("50 Tk")],
+                    children: [
+                      Text("Delivery Charge"),
+                      Text(
+                        "${cartController.cartItems.fold(0, (sum, item) => sum + (item.book.deliveryCharge ?? 0))} Tk",
+                      ),
+                    ],
                   ),
+
                   const Divider(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
+                    children: [
                       Text(
                         "Total Payable Amount",
                         style: TextStyle(
@@ -183,7 +235,7 @@ class CartScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "269 Tk",
+                        "${cartController.totalAmount + cartController.cartItems.fold(0, (sum, item) => sum + (item.book.deliveryCharge ?? 0))} Tk",
                         style: TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
