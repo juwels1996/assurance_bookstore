@@ -329,38 +329,59 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                     //     ),
                     //   ),
                     // ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.to(
-                          () => BookPdfPreviewScreen(
-                            pdfUrl:
-                                "https://corsproxy.io/?https://tourism.gov.in/sites/default/files/2019-04/dummy-pdf_2.pdf",
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Row(
-                            children: [
-                              Text(
-                                'একটু পড়ে দেখুন',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                    book.previewPdfUrl!.isNotEmpty
+                        ? GestureDetector(
+                            onTap: () {
+                              html.window.open(
+                                Constants.imageUrl +
+                                    book.previewPdfUrl.toString(),
+                                '_blank',
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade700,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'একটু পড়ে দেখুন',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
+                          )
+                        : Container(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.yellow,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            alignment: Alignment.center,
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'No Pdf Available',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
                 SizedBox(height: 4),

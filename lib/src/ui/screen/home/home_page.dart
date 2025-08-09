@@ -10,6 +10,7 @@ import '../../../core/controllers/home/home_controller.dart';
 import '../../../core/models/home/home_page_data.dart';
 import '../../widgets/custom_appbar.dart';
 import '../book-details/book-details_Screen.dart';
+import 'components/banner_scroll_widget.dart';
 import 'components/book_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,6 +21,7 @@ class HomePage extends StatefulWidget {
 }
 
 final homeController = Get.find<HomeController>();
+final authController = Get.find<AuthController>();
 
 class _HomePageState extends State<HomePage> {
   @override
@@ -77,10 +79,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                   children: [
                     const Icon(Icons.account_circle, color: Colors.black),
                     const SizedBox(width: 8),
-                    Text(
-                      'Hello, ${authController.emailController.text.split('@')[0]}', // Display the first part of the email as username
-                      style: TextStyle(color: Colors.black, fontSize: 16),
-                    ),
+                    Text("Hello, ${authController.username.value}"),
                   ],
                 ),
               );
@@ -162,53 +161,55 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (homeController.banners.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: SizedBox(
-                        height: Responsive.isSmallScreen(context) ? 200 : 300,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: homeController.banners.length,
-                          itemBuilder: (context, index) {
-                            final banner = homeController.banners[index];
-                            return GestureDetector(
-                              onTap: () async {
-                                final url = Uri.parse(banner.link);
-                                if (await canLaunchUrl(url)) {
-                                  await launchUrl(url);
-                                }
-                              },
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      Constants.imageUrl + banner.image,
-                                      width: Responsive.isSmallScreen(context)
-                                          ? MediaQuery.of(context).size.width *
-                                                0.6
-                                          : MediaQuery.of(context).size.width *
-                                                0.7,
-                                      height: Responsive.isSmallScreen(context)
-                                          ? MediaQuery.of(context).size.width *
-                                                0.3
-                                          : MediaQuery.of(context).size.width *
-                                                0.3,
+                  // if (homeController.banners.isNotEmpty)
+                  //   Padding(
+                  //     padding: const EdgeInsets.symmetric(vertical: 10),
+                  //     child: SizedBox(
+                  //       height: Responsive.isSmallScreen(context) ? 200 : 300,
+                  //       child: ListView.builder(
+                  //         scrollDirection: Axis.horizontal,
+                  //         itemCount: homeController.banners.length,
+                  //         itemBuilder: (context, index) {
+                  //           final banner = homeController.banners[index];
+                  //           return GestureDetector(
+                  //             onTap: () async {
+                  //               final url = Uri.parse(banner.link);
+                  //               if (await canLaunchUrl(url)) {
+                  //                 await launchUrl(url);
+                  //               }
+                  //             },
+                  //             child: Center(
+                  //               child: Padding(
+                  //                 padding: const EdgeInsets.symmetric(
+                  //                   horizontal: 8.0,
+                  //                 ),
+                  //                 child: ClipRRect(
+                  //                   borderRadius: BorderRadius.circular(12),
+                  //                   child: Image.network(
+                  //                     Constants.imageUrl + banner.image,
+                  //                     width: Responsive.isSmallScreen(context)
+                  //                         ? MediaQuery.of(context).size.width *
+                  //                               0.6
+                  //                         : MediaQuery.of(context).size.width *
+                  //                               0.7,
+                  //                     height: Responsive.isSmallScreen(context)
+                  //                         ? MediaQuery.of(context).size.width *
+                  //                               0.3
+                  //                         : MediaQuery.of(context).size.width *
+                  //                               0.3,
+                  //
+                  //                     fit: BoxFit.fill,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           );
+                  //         },
+                  //       ),
+                  //     ),
+                  //   ),
+                  AutoScrollBanners(banners: homeController.banners),
 
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
                   ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),

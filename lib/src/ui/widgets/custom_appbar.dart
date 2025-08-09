@@ -5,6 +5,7 @@ import 'package:get/get_core/src/get_main.dart';
 
 import '../../core/controllers/auth/auth_controller.dart';
 import '../screen/auth/login_screen.dart';
+import '../screen/profile/user_profile_screen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -99,12 +100,21 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         IconButton(
                           icon: const Icon(Icons.home, color: Colors.black),
                           onPressed: () {
-                            Get.to(() => HomePage()); // Navigate to Home Screen
+                            // Use Future.delayed to avoid rebuild during navigation
+                            Future.delayed(Duration(milliseconds: 500), () {
+                              Get.offAll(
+                                () => HomePage(),
+                              ); // Navigate to Home Screen
+                            });
                           },
                         ),
-                        Text(
-                          'Hello, ${authController.emailController.text.split('@')[0]}', // Display the first part of the email as username
-                          style: const TextStyle(color: Colors.black),
+                        GestureDetector(
+                          onTap: () {
+                            Get.to(() => ProfileScreen());
+                          },
+                          child: Text(
+                            "Hello, ${authController.username.value}",
+                          ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.logout, color: Colors.black),

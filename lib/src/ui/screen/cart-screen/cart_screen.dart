@@ -217,9 +217,7 @@ class CartScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("Delivery Charge"),
-                      Text(
-                        "${cartController.cartItems.fold(0, (sum, item) => sum + (item.book.deliveryCharge ?? 0))} Tk",
-                      ),
+                      Text("${cartController.totalDeliveryCharge} Tk"),
                     ],
                   ),
 
@@ -235,7 +233,7 @@ class CartScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "${cartController.totalAmount + cartController.cartItems.fold(0, (sum, item) => sum + (item.book.deliveryCharge ?? 0))} Tk",
+                        "${cartController.totalAmount + cartController.totalDeliveryCharge} Tk",
                         style: TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,

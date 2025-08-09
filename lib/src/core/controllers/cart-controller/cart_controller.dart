@@ -57,4 +57,27 @@ class CartController extends GetxController {
     final price = item.book.discountedPrice ?? item.book.price ?? 0;
     return sum + (price * item.quantity.value);
   });
+
+  int get totalDeliveryCharge {
+    int totalCharge = 0;
+
+    for (var item in cartItems) {
+      final deliveryCharge = item.book.deliveryCharge ?? 0;
+      totalCharge += deliveryCharge;
+
+      // After the first book, apply additional charges based on quantity
+      if (item.quantity.value > 1) {
+        // If quantity is 2, apply 40 Tk per book
+        if (item.quantity.value == 2) {
+          totalCharge += 40;
+        }
+        // If quantity is more than 2, apply 20 Tk per additional book
+        if (item.quantity.value > 2) {
+          totalCharge += (item.quantity.value - 2) * 20;
+        }
+      }
+    }
+
+    return totalCharge;
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../../core/controllers/checkout-controller/checkout_controller.dart';
 
 class DeliveryAddressScreen extends StatefulWidget {
@@ -10,6 +11,7 @@ class DeliveryAddressScreen extends StatefulWidget {
 
 class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   final checkoutController = Get.find<CheckoutController>();
+  final cartController = Get.find<CartController>();
 
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
@@ -106,6 +108,61 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
               noteController,
               icon: Icons.notes,
               maxLines: 3,
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Order Summary",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Subtotal"),
+                      Text("${cartController.totalPrice} Tk"),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [Text("VAT"), Text("0 Tk")],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Delivery Charge"),
+                      Text("${cartController.totalDeliveryCharge} Tk"),
+                    ],
+                  ),
+
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Total Payable Amount",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        "${cartController.totalAmount + cartController.totalDeliveryCharge} Tk",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 20),

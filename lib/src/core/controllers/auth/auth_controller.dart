@@ -12,6 +12,7 @@ class AuthController extends GetxController {
   var isAuthenticated = false.obs;
   var token = ''.obs;
   var username = ''.obs;
+  var emailname = ''.obs;
 
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
@@ -48,8 +49,12 @@ class AuthController extends GetxController {
 
         // Save the token and email in shared preferences
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', accessToken);
-        await prefs.setString('email', email);
+        await prefs.setString('token', accessToken); // Store token here
+        await prefs.setString('email', email); // Store email here
+        await prefs.setString(
+          'username',
+          email.split('@')[0],
+        ); // Store username here
 
         // Store the token and set isAuthenticated to true
         prefs.setString('access_token', accessToken);
@@ -94,7 +99,8 @@ class AuthController extends GetxController {
 
         prefs.setString('access_token', accessToken);
 
-        username.value = email.split('@')[0]; // Extract username from email
+        username.value = email.split('@')[0];
+        emailname.value = email;
         token.value = accessToken;
         isAuthenticated.value = true;
 
@@ -116,26 +122,32 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     isAuthenticated.value = false;
     token.value = '';
-    username.value = ''; // Reset username
+    username.value = '';
+    emailname.value = '';
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // Clear stored preferences
     // Optional: If using GetStorage
   }
 
-  // ✅ AUTO LOGIN CHECK
   void checkAuthStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final savedToken = prefs.getString('token');
-    final savedUsername = prefs.getString('username'); // Retrieve username
+    final savedUsername = prefs.getString('username');
+    final savedUserEmail = prefs.getString('emailname');
 
+    print('Saved token: $savedToken'); // Debugging line
+    print('Saved username: $savedUsername');
+    print("Saved emailname: $emailname"); // Debugging line
     if (savedToken != null && savedToken.isNotEmpty) {
       token.value = savedToken;
       isAuthenticated.value = true;
-      username.value = savedUsername ?? ''; // Update the username if available
+      username.value = savedUsername ?? '';
+      print('User is authenticated');
     } else {
       token.value = '';
       isAuthenticated.value = false;
+      print('User is not authenticated');
     }
   }
 }

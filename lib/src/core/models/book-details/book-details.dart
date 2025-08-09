@@ -62,7 +62,7 @@ class BookDetail {
     discountPercent: json['discount_percent'] is int
         ? json['discount_percent']
         : int.tryParse(json['discount_percent']?.toString() ?? "0"),
-    deliveryCharge: json['deliveryCharge'],
+    deliveryCharge: json['delivery_charge'],
     isAvailable: json['is_available'] ?? false,
     quantityAvailable: json['quantity_available'] is int
         ? json['quantity_available']

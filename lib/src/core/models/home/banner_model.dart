@@ -5,6 +5,7 @@ class BannerModel {
   final String description;
   final String link;
   final bool isActive;
+  List<dynamic> images;
 
   BannerModel({
     required this.id,
@@ -13,6 +14,7 @@ class BannerModel {
     required this.description,
     required this.link,
     required this.isActive,
+    required this.images,
   });
 
   factory BannerModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class BannerModel {
       description: json['description'],
       link: json['link'],
       isActive: json['is_active'],
+      images: List<dynamic>.from(json["images"].map((x) => x)),
     );
   }
 }
