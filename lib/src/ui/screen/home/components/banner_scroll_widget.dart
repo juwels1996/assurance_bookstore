@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:assurance_bookstore/src/ui/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -54,7 +55,10 @@ class _AutoScrollBannersState extends State<AutoScrollBanners> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.3,
+        height: Responsive.isSmallScreen(context)
+            ? MediaQuery.of(context).size.height * 0.2
+            : MediaQuery.of(context).size.height * 0.35,
+        width: MediaQuery.of(context).size.width * 0.9,
         child: PageView.builder(
           controller: _pageController,
           itemCount: widget.banners.length,
@@ -71,7 +75,7 @@ class _AutoScrollBannersState extends State<AutoScrollBanners> {
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
                   Constants.imageUrl + banner.image,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                 ),
               ),
             );

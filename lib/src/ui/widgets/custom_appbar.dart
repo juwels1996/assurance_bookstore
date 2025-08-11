@@ -77,10 +77,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.assignment, color: Colors.black),
-                      onPressed: () {},
-                    ),
-                    IconButton(
                       icon: const Icon(
                         Icons.shopping_cart,
                         color: Colors.black,
@@ -95,7 +91,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Icon(Icons.account_circle, color: Colors.black),
                         const SizedBox(width: 8),
                         IconButton(
                           icon: const Icon(Icons.home, color: Colors.black),

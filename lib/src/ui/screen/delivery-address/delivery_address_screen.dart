@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
+import '../../../core/controllers/auth/auth_controller.dart';
 import '../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../../core/controllers/checkout-controller/checkout_controller.dart';
 
 class DeliveryAddressScreen extends StatefulWidget {
   @override
-  State<DeliveryAddressScreen> createState() => _DeliveryAddressScreenState();
+  _DeliveryAddressScreenState createState() => _DeliveryAddressScreenState();
 }
 
 class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
@@ -24,7 +26,38 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   final thanaController = TextEditingController();
   final noteController = TextEditingController();
 
-  bool isHome = true;
+  String savedAddress = ""; // To store the saved address
+  bool isAddressSaved = false; // To check if address is saved
+
+  @override
+  void initState() {
+    super.initState();
+    fetchSavedAddress();
+  }
+
+  // Fetch saved address from backend
+  void fetchSavedAddress() async {
+    final response = await checkoutController.getSavedAddress();
+    if (response != null) {
+      setState(() {
+        isAddressSaved = true; // Set to true if address is saved
+        savedAddress =
+            "${response['flat']} ${response['phone']}, ${response['street']}, ${response['district']}, ${response['thana']}, Bangladesh";
+
+        // Pre-fill fields with saved address
+        nameController.text = response['name'];
+        phoneController.text = response['phone'];
+        flatController.text = response['flat'];
+        houseController.text = response['house'];
+        addressController.text = response['street'];
+        postCodeController.text = response['post_code'];
+        altPhoneController.text = response['alternate_phone'];
+        districtController.text = response['district'];
+        thanaController.text = response['thana'];
+        noteController.text = response['special_instruction'] ?? '';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,71 +77,75 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            ToggleButtons(
-              isSelected: [isHome, !isHome],
-              onPressed: (index) => setState(() => isHome = index == 0),
-              children: const [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(children: [Icon(Icons.home), Text(" Home")]),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [Icon(Icons.apartment), Text(" Office")],
-                  ),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(8),
-              selectedColor: Colors.white,
-              fillColor: Colors.green,
-            ),
-            const SizedBox(height: 20),
 
-            _buildRowFields(
-              "Your Name",
-              nameController,
-              Icons.person,
-              "Mobile No",
-              phoneController,
-              Icons.phone,
-            ),
-            _buildRowFields(
-              "Flat No./Floor",
-              flatController,
-              Icons.domain,
-              "House No. & Name",
-              houseController,
-              Icons.home_work,
-            ),
-            _buildField(
-              "Street Address (Road No, Area, Union)",
-              addressController,
-              icon: Icons.location_on,
-              maxLines: 2,
-            ),
-            _buildRowFields(
-              "Post Code",
-              postCodeController,
-              Icons.pin,
-              "Alternate Mobile No",
-              altPhoneController,
-              Icons.phone_android,
-            ),
-            _buildRowFields(
-              "District",
-              districtController,
-              Icons.map,
-              "Thana",
-              thanaController,
-              Icons.location_city,
-            ),
-            _buildField(
-              "Special Instruction (Optional)",
-              noteController,
-              icon: Icons.notes,
-              maxLines: 3,
-            ),
+            // If the address is saved, show it as text and an option to add a new address
+            if (isAddressSaved) ...[
+              const Text(
+                "Saved Address",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                savedAddress,
+                style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isAddressSaved = false; // Allow user to enter new address
+                    savedAddress = ""; // Clear saved address
+                  });
+                },
+                child: const Text("Add New Address"),
+              ),
+            ] else ...[
+              // Input fields for a new address if none is saved
+              _buildRowFields(
+                "Your Name",
+                nameController,
+                Icons.person,
+                "Mobile No",
+                phoneController,
+                Icons.phone,
+              ),
+              _buildRowFields(
+                "Flat No./Floor",
+                flatController,
+                Icons.domain,
+                "House No. & Name",
+                houseController,
+                Icons.home_work,
+              ),
+              _buildField(
+                "Street Address (Road No, Area, Union)",
+                addressController,
+                icon: Icons.location_on,
+                maxLines: 2,
+              ),
+              _buildRowFields(
+                "Post Code",
+                postCodeController,
+                Icons.pin,
+                "Alternate Mobile No",
+                altPhoneController,
+                Icons.phone_android,
+              ),
+              _buildRowFields(
+                "District",
+                districtController,
+                Icons.map,
+                "Thana",
+                thanaController,
+                Icons.location_city,
+              ),
+              _buildField(
+                "Special Instruction (Optional)",
+                noteController,
+                icon: Icons.notes,
+                maxLines: 3,
+              ),
+            ],
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

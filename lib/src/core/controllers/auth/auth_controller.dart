@@ -13,6 +13,7 @@ class AuthController extends GetxController {
   var token = ''.obs;
   var username = ''.obs;
   var emailname = ''.obs;
+  var refreshToken = ''.obs;
 
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
@@ -120,14 +121,10 @@ class AuthController extends GetxController {
 
   // ✅ LOGOUT
   Future<void> logout() async {
-    isAuthenticated.value = false;
-    token.value = '';
-    username.value = '';
-    emailname.value = '';
-
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Clear stored preferences
-    // Optional: If using GetStorage
+    await prefs.clear(); // Clear saved credentials
+    token.value = '';
+    refreshToken.value = '';
   }
 
   void checkAuthStatus() async {

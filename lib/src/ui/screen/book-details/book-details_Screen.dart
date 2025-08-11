@@ -472,9 +472,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 Divider(),
 
                 SizedBox(
-                  height: Responsive.isSmallScreen(context)
-                      ? MediaQuery.of(context).size.height * 0.25
-                      : MediaQuery.of(context).size.height * 0.35,
+                  height: Responsive.isSmallScreen(context) ? 190 : 292,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: book.relatedBooks?.length,

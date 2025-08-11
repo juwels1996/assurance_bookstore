@@ -12,6 +12,7 @@ class CartItem {
 
 class CartController extends GetxController {
   var cartItems = <CartItem>[].obs;
+  String paymentMethod = 'bkash';
 
   int get totalItems =>
       cartItems.fold(0, (sum, item) => sum + item.quantity.value);
@@ -60,20 +61,38 @@ class CartController extends GetxController {
 
   int get totalDeliveryCharge {
     int totalCharge = 0;
+    int totalBooks = cartItems.fold(
+      0,
+      (sum, item) => sum + item.quantity.value,
+    );
 
     for (var item in cartItems) {
       final deliveryCharge = item.book.deliveryCharge ?? 0;
-      totalCharge += deliveryCharge;
 
-      // After the first book, apply additional charges based on quantity
-      if (item.quantity.value > 1) {
-        // If quantity is 2, apply 40 Tk per book
-        if (item.quantity.value == 2) {
-          totalCharge += 40;
+      // Logic for COD (Cash on Delivery)
+      if (paymentMethod == 'cod') {
+        if (totalBooks == 1) {
+          // For the first book: Initial delivery charge from backend + 40
+          totalCharge += deliveryCharge + 40;
+        } else if (totalBooks == 2) {
+          // For the second book: Initial delivery charge from backend + 40 for 1st book + 40 for 2nd book
+          totalCharge += deliveryCharge + 40 + 40;
+        } else if (totalBooks > 2) {
+          // For more than 2 books: Initial delivery charge from backend + 40 for first two books + 20 for each additional book
+          totalCharge += deliveryCharge + 40 + 40 + (totalBooks - 2) * 20;
         }
-        // If quantity is more than 2, apply 20 Tk per additional book
-        if (item.quantity.value > 2) {
-          totalCharge += (item.quantity.value - 2) * 20;
+      }
+      // Logic for other payment methods (bKash or regular)
+      else {
+        if (totalBooks == 1) {
+          // For the first book: Only the delivery charge from backend
+          totalCharge += deliveryCharge;
+        } else if (totalBooks == 2) {
+          // For the second book: Initial delivery charge from backend + 40
+          totalCharge += deliveryCharge + 40;
+        } else if (totalBooks > 2) {
+          // For more than 2 books: Add 20 Taka for each additional book
+          totalCharge += deliveryCharge + 40 + (totalBooks - 2) * 20;
         }
       }
     }

@@ -1,34 +1,30 @@
-import 'package:assurance_bookstore/src/ui/screen/cart-screen/checkout_screen.dart';
-import 'package:assurance_bookstore/src/ui/screen/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../../core/constants/constants.dart';
 import '../../../core/controllers/auth/auth_controller.dart';
 import '../../../core/controllers/cart-controller/cart_controller.dart';
+import '../../../core/controllers/checkout-controller/checkout_controller.dart';
 import '../auth/login_screen.dart';
 import '../delivery-address/delivery_address_screen.dart';
+import '../home/home_page.dart';
 
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+class CartScreen extends StatefulWidget {
+  @override
+  _CartScreenState createState() => _CartScreenState();
+}
 
-import '../../../core/controllers/auth/auth_controller.dart';
-import '../../../core/controllers/cart-controller/cart_controller.dart';
-import '../auth/login_screen.dart';
-import '../delivery-address/delivery_address_screen.dart';
-
-class CartScreen extends StatelessWidget {
+class _CartScreenState extends State<CartScreen> {
   final cartController = Get.find<CartController>();
+  final authController = Get.find<AuthController>();
+
+  String paymentMethod = 'bkash'; // Default payment method is bKash
 
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>(); // Get the AuthController
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("My Cart"),
         actions: [
-          // If user is logged in, show username or email, otherwise show login button
           Obx(() {
             if (authController.isLoggedIn) {
               return Padding(
@@ -193,6 +189,46 @@ class CartScreen extends StatelessWidget {
               ),
             ),
 
+            // Payment Method Selection (bKash or COD)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Select Payment Method",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  Row(
+                    children: [
+                      Radio<String>(
+                        value: 'bkash',
+                        groupValue: cartController.paymentMethod,
+                        onChanged: (value) {
+                          setState(() {
+                            cartController.paymentMethod = value!;
+                          });
+                        },
+                      ),
+                      const Text("bKash"),
+                      const SizedBox(width: 20),
+                      Radio<String>(
+                        value: 'cod',
+                        groupValue: cartController.paymentMethod,
+                        onChanged: (value) {
+                          setState(() {
+                            cartController.paymentMethod = value!;
+                          });
+                        },
+                      ),
+                      const Text("Cash on Delivery (COD)"),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Order Summary
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
@@ -220,7 +256,6 @@ class CartScreen extends StatelessWidget {
                       Text("${cartController.totalDeliveryCharge} Tk"),
                     ],
                   ),
-
                   const Divider(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -245,6 +280,7 @@ class CartScreen extends StatelessWidget {
               ),
             ),
 
+            // Proceed to Checkout Button
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
@@ -261,7 +297,6 @@ class CartScreen extends StatelessWidget {
                     });
                   }
                 },
-
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
@@ -276,48 +311,3 @@ class CartScreen extends StatelessWidget {
     );
   }
 }
-
-// 🎁 Coupon Area
-// Padding(
-//   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-//   child: Row(
-//     children: [
-//       Expanded(
-//         child: TextField(
-//           decoration: const InputDecoration(
-//             hintText: "Enter Coupon/Promo Code",
-//             border: OutlineInputBorder(),
-//             isDense: true,
-//             contentPadding: EdgeInsets.symmetric(
-//               horizontal: 10,
-//               vertical: 8,
-//             ),
-//           ),
-//         ),
-//       ),
-//       const SizedBox(width: 8),
-//       ElevatedButton(
-//         onPressed: () {},
-//         style: ElevatedButton.styleFrom(
-//           backgroundColor: Colors.red,
-//         ),
-//         child: const Text("Apply"),
-//       ),
-//     ],
-//   ),
-// ),
-// Padding(
-//   padding: const EdgeInsets.symmetric(horizontal: 16),
-//   child: Align(
-//     alignment: Alignment.centerLeft,
-//     child: TextButton(
-//       onPressed: () {},
-//       child: const Text(
-//         "View available coupon",
-//         style: TextStyle(color: Colors.red),
-//       ),
-//     ),
-//   ),
-// ),
-
-// 🧾 Order Summary

@@ -21,6 +21,7 @@ class HomeController extends GetxController {
   final isFilter = false.obs;
   final homePageData = <HomePageData>[].obs;
   final banners = <BannerModel>[].obs;
+  final RxList<Book> books = <Book>[].obs;
 
   Future<void> fetchHomeData() async {
     isLoading.value = true;
@@ -55,6 +56,30 @@ class HomeController extends GetxController {
       isError.value = true;
       loadStatus.value = "Error";
     } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> searchBooks(String query) async {
+    isLoading.value = true;
+
+    try {
+      final response = await DioConfig().dio.get('search_books/?query=$query');
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        books.value = List<Book>.from(
+          data.map((bookData) => Book.fromJson(bookData)),
+        );
+
+        isLoading.value = false;
+      } else {
+        isError.value = true;
+        errorMessage.value = "Error: ${response.statusMessage}";
+      }
+    } catch (e) {
+      isError.value = true;
+      errorMessage.value = "Exception: $e";
       isLoading.value = false;
     }
   }

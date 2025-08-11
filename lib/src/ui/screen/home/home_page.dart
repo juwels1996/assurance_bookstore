@@ -1,17 +1,16 @@
-import 'package:assurance_bookstore/src/core/controllers/auth/auth_controller.dart';
 import 'package:assurance_bookstore/src/core/helper/extension.dart';
-import 'package:assurance_bookstore/src/ui/widgets/responsive.dart';
+import 'package:assurance_bookstore/src/ui/screen/home/subbcategory-widget/subcategory_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/constants/constants.dart';
+import '../../../core/controllers/auth/auth_controller.dart';
 import '../../../core/controllers/home/home_controller.dart';
 import '../../../core/models/home/home_page_data.dart';
 import '../../widgets/custom_appbar.dart';
-import '../book-details/book-details_Screen.dart';
+import '../../widgets/responsive.dart';
 import 'components/banner_scroll_widget.dart';
 import 'components/book_card.dart';
+import 'components/search_result.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +21,8 @@ class HomePage extends StatefulWidget {
 
 final homeController = Get.find<HomeController>();
 final authController = Get.find<AuthController>();
+TextEditingController _searchController = TextEditingController();
+bool _isLoading = false;
 
 class _HomePageState extends State<HomePage> {
   @override
@@ -35,7 +36,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(),
-
       body: Obx(() {
         if (homeController.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -49,11 +49,37 @@ class _HomePageState extends State<HomePage> {
               await homeController.fetchHomeData(); // call your API
             },
             child: SingleChildScrollView(
-              physics:
-                  const AlwaysScrollableScrollPhysics(), // ensure it's always scrollable
-              child: buildCategoryList(
-                homeController.homePageData.value,
-                context,
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
+                  // Search Field
+                  TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      labelText: 'Search Books',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: () {
+                          homeController
+                              .searchBooks(_searchController.text)
+                              .then((_) {
+                                if (homeController.books.isNotEmpty) {
+                                  Get.to(() => SearchResultScreen());
+                                } else {
+                                  // If no results, show a snackbar or message
+                                  Get.snackbar(
+                                    'No results found',
+                                    'Try another search',
+                                  );
+                                }
+                              });
+                        },
+                      ),
+                    ),
+                  ),
+
+                  buildCategoryList(homeController.homePageData.value, context),
+                ],
               ),
             ),
           );
@@ -71,37 +97,57 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
       Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Obx(() {
-            if (authController.isLoggedIn) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    const Icon(Icons.account_circle, color: Colors.black),
-                    const SizedBox(width: 8),
-                    Text("Hello, ${authController.username.value}"),
-                  ],
-                ),
-              );
-            } else {
-              return Container();
-            }
-          }),
           SizedBox(height: 20),
           Container(
             height: MediaQuery.of(context).size.height * 0.90,
             width: Responsive.isSmallScreen(context)
-                ? MediaQuery.of(context).size.width * 0.35
+                ? MediaQuery.of(context).size.width * 0.25
                 : MediaQuery.of(context).size.width * 0.15,
             color: Colors.grey.shade100,
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(6.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
+                      Obx(() {
+                        if (authController.isLoggedIn) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 8),
+                                Column(
+                                  children: [
+                                    Text(
+                                      " Welcome",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Text(
+                                      " ${authController.username.value}",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      }),
+
                       Text(
                         'বিষয়',
                         style: TextStyle(
@@ -145,7 +191,12 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                           ),
                         ),
                         onTap: () {
-                          // handle tap
+                          Get.to(
+                            () => SubcategoryScreen(
+                              subcategoryId: sub.id.toString(),
+                              subcategoryName: sub.name,
+                            ),
+                          );
                         },
                       );
                     }).toList(),
@@ -161,53 +212,6 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // if (homeController.banners.isNotEmpty)
-                  //   Padding(
-                  //     padding: const EdgeInsets.symmetric(vertical: 10),
-                  //     child: SizedBox(
-                  //       height: Responsive.isSmallScreen(context) ? 200 : 300,
-                  //       child: ListView.builder(
-                  //         scrollDirection: Axis.horizontal,
-                  //         itemCount: homeController.banners.length,
-                  //         itemBuilder: (context, index) {
-                  //           final banner = homeController.banners[index];
-                  //           return GestureDetector(
-                  //             onTap: () async {
-                  //               final url = Uri.parse(banner.link);
-                  //               if (await canLaunchUrl(url)) {
-                  //                 await launchUrl(url);
-                  //               }
-                  //             },
-                  //             child: Center(
-                  //               child: Padding(
-                  //                 padding: const EdgeInsets.symmetric(
-                  //                   horizontal: 8.0,
-                  //                 ),
-                  //                 child: ClipRRect(
-                  //                   borderRadius: BorderRadius.circular(12),
-                  //                   child: Image.network(
-                  //                     Constants.imageUrl + banner.image,
-                  //                     width: Responsive.isSmallScreen(context)
-                  //                         ? MediaQuery.of(context).size.width *
-                  //                               0.6
-                  //                         : MediaQuery.of(context).size.width *
-                  //                               0.7,
-                  //                     height: Responsive.isSmallScreen(context)
-                  //                         ? MediaQuery.of(context).size.width *
-                  //                               0.3
-                  //                         : MediaQuery.of(context).size.width *
-                  //                               0.3,
-                  //
-                  //                     fit: BoxFit.fill,
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           );
-                  //         },
-                  //       ),
-                  //     ),
-                  //   ),
                   AutoScrollBanners(banners: homeController.banners),
 
                   ListView.builder(
@@ -222,7 +226,6 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Category Header Row
                             Padding(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 16.0,
@@ -283,8 +286,8 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                   SizedBox(height: 5),
                                   SizedBox(
                                     height: Responsive.isSmallScreen(context)
-                                        ? 200
-                                        : 300,
+                                        ? 190
+                                        : 292,
                                     child: ListView.builder(
                                       scrollDirection: Axis.horizontal,
                                       itemCount: sub.books.length,
@@ -310,89 +313,5 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
         ],
       ),
     ],
-  );
-}
-
-Widget buildBookCard(Book book) {
-  return GestureDetector(
-    onTap: () {
-      Get.to(() => BookDetailsScreen(bookId: book.id.toString()));
-    },
-    child: Container(
-      width: 140,
-      margin: const EdgeInsets.only(left: 20, right: 8),
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: Image.network(
-                  'http://192.168.68.103:8000${book.image}',
-                  // already full path in model
-                  fit: BoxFit.contain,
-                  scale: 0.6,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey.shade300,
-                    child: const Center(child: Icon(Icons.broken_image)),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                book.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              // const SizedBox(height: 4),
-              // Text(
-              //   "Juwel Sheikh",
-              //   maxLines: 1,
-              //   overflow: TextOverflow.ellipsis,
-              //   style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-              // ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Text(
-                    "৳৮৬০",
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    "৳৯৮০",
-                    style: TextStyle(
-                      decoration: TextDecoration.lineThrough,
-                      color: Colors.grey.shade600,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Positioned(
-            top: 0,
-            left: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text(
-                '২০% ছাড়',
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
   );
 }

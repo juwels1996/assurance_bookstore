@@ -30,8 +30,9 @@ class _BookCardState extends State<BookCard> {
           Get.to(() => BookDetailsScreen(bookId: book.id.toString()));
         },
         child: Container(
-          width: Responsive.isSmallScreen(context) ? 100 : 150,
-          margin: const EdgeInsets.only(left: 20, right: 8, bottom: 12),
+          width: Responsive.isSmallScreen(context) ? 110 : 150,
+          height: Responsive.isSmallScreen(context) ? 100 : 150,
+          margin: const EdgeInsets.only(left: 12, right: 0, bottom: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             color: Colors.white,
@@ -45,54 +46,57 @@ class _BookCardState extends State<BookCard> {
           ),
           child: Stack(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: Image.network(
-                      Constants.imageUrl + book.image,
-                      fit: BoxFit.contain,
-                      scale: 0.6,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey.shade300,
-                        child: const Center(child: Icon(Icons.broken_image)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    book.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: Responsive.isSmallScreen(context) ? 10 : 14,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "৳৮৬০,",
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: Image.network(
+                        Constants.imageUrl + book.image,
+                        fit: BoxFit.contain,
+                        scale: Responsive.isSmallScreen(context) ? 0.9 : 0.6,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey.shade300,
+                          child: const Center(child: Icon(Icons.broken_image)),
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      // if (book.discountedPrice != null &&
-                      //     book.discountedPrice != book.price)
-                      Text(
-                        "৳8১০,",
-                        style: TextStyle(
-                          decoration: TextDecoration.lineThrough,
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
-                        ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      book.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: Responsive.isSmallScreen(context) ? 10 : 14,
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "৳৮৬০,",
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        // if (book.discountedPrice != null &&
+                        //     book.discountedPrice != book.price)
+                        Text(
+                          "৳8১০,",
+                          style: TextStyle(
+                            decoration: TextDecoration.lineThrough,
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               // if (book.discountPercent != null && book.discountPercent! > 0)
               Positioned(

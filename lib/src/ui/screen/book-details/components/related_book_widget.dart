@@ -36,6 +36,7 @@ class _BookDetailsCardState extends State<BookDetailsCard> {
         },
         child: Container(
           width: 160,
+          height: 120,
           margin: const EdgeInsets.only(left: 20, right: 8, bottom: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
@@ -63,11 +64,12 @@ class _BookDetailsCardState extends State<BookDetailsCard> {
                         ),
                         child: Image.network(
                           Constants.imageUrl + book.image,
-                          height: Responsive.isSmallScreen(context)
-                              ? MediaQuery.of(context).size.height * 0.14
-                              : MediaQuery.of(context).size.height * 0.12,
+                          // height: Responsive.isSmallScreen(context)
+                          //     ? MediaQuery.of(context).size.height * 0.14
+                          //     : MediaQuery.of(context).size.height * 0.12,
                           width: double.infinity,
-                          fit: BoxFit.cover,
+                          height: Responsive.isSmallScreen(context) ? 110 : 160,
+                          fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) =>
                               Container(
                                 height: 120,
