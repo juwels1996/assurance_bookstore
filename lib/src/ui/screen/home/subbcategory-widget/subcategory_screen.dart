@@ -35,7 +35,7 @@ class _SubcategoryScreenState extends State<SubcategoryScreen> {
   Future<void> fetchBooksForSubcategory() async {
     final response = await http.get(
       Uri.parse(
-        'http://192.168.68.102:8000/api/books/subcategory/${widget.subcategoryId}/',
+        '${Constants.baseUrl}books/subcategory/${widget.subcategoryId}/',
       ),
     );
 

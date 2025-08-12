@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 import '../../../../core/constants/constants.dart';
+import '../../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../book-details/book-details_Screen.dart';
 
 class BookCard extends StatefulWidget {
@@ -18,6 +19,7 @@ class BookCard extends StatefulWidget {
 
 class _BookCardState extends State<BookCard> {
   bool isHovered = false;
+  final CartController cartController = Get.find();
   @override
   Widget build(BuildContext context) {
     final book = widget.book;
@@ -126,7 +128,10 @@ class _BookCardState extends State<BookCard> {
                   duration: const Duration(milliseconds: 200),
                   child: GestureDetector(
                     onTap: () {
-                      // cartController.addToCart("");
+                      cartController.addToCartHome(book);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('${book.title} added to cart')),
+                      );
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 4),

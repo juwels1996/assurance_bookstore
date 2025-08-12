@@ -1,3 +1,4 @@
+import 'package:assurance_bookstore/src/core/constants/constants.dart';
 import 'package:assurance_bookstore/src/ui/screen/book-details/book-details_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,8 +25,11 @@ class SearchResultScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             final book = homeController.books[index];
             return ListTile(
-              title: Text(book.title),
-              subtitle: Text(book.description),
+              title: Image.network(
+                "${Constants.imageUrl + book.image}",
+                height: 70,
+              ),
+              subtitle: Text(book.title),
               onTap: () {
                 Get.to(BookDetailsScreen(bookId: book.id.toString()));
               },

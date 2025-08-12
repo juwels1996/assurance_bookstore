@@ -1,13 +1,16 @@
 import 'package:assurance_bookstore/src/core/helper/extension.dart';
 import 'package:assurance_bookstore/src/ui/screen/home/subbcategory-widget/subcategory_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../core/controllers/auth/auth_controller.dart';
+import '../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../../core/controllers/home/home_controller.dart';
 import '../../../core/models/home/home_page_data.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/responsive.dart';
+import '../cart-screen/cart_screen.dart';
 import 'components/banner_scroll_widget.dart';
 import 'components/book_card.dart';
 import 'components/search_result.dart';
@@ -23,6 +26,7 @@ final homeController = Get.find<HomeController>();
 final authController = Get.find<AuthController>();
 TextEditingController _searchController = TextEditingController();
 bool _isLoading = false;
+final CartController cartController = Get.find();
 
 class _HomePageState extends State<HomePage> {
   @override
@@ -52,29 +56,86 @@ class _HomePageState extends State<HomePage> {
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
                 children: [
+                  // Obx(() {
+                  //   return Stack(
+                  //     alignment: Alignment.topRight,
+                  //     children: [
+                  //       IconButton(
+                  //         icon: const Icon(Icons.shopping_cart),
+                  //         onPressed: () {
+                  //           Get.to(
+                  //             () => CartScreen(),
+                  //           ); // Navigate to cart screen
+                  //         },
+                  //       ),
+                  //       if (cartController.totalItemsHome > 0)
+                  //         Positioned(
+                  //           right: 6,
+                  //           top: 6,
+                  //           child: Container(
+                  //             padding: const EdgeInsets.all(4),
+                  //             decoration: BoxDecoration(
+                  //               color: Colors.red,
+                  //               shape: BoxShape.circle,
+                  //             ),
+                  //             child: Obx(
+                  //               () => Text(
+                  //                 '${cartController.totalItemsHome}',
+                  //                 style: const TextStyle(
+                  //                   fontSize: 12,
+                  //                   color: Colors.white,
+                  //                   fontWeight: FontWeight.bold,
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //     ],
+                  //   );
+                  // }),
+
                   // Search Field
-                  TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      labelText: 'Search Books',
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: () {
-                          homeController
-                              .searchBooks(_searchController.text)
-                              .then((_) {
-                                if (homeController.books.isNotEmpty) {
-                                  Get.to(() => SearchResultScreen());
-                                } else {
-                                  // If no results, show a snackbar or message
-                                  Get.snackbar(
-                                    'No results found',
-                                    'Try another search',
-                                  );
-                                }
-                              });
-                        },
-                      ),
+                  Container(
+                    height: 60,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 8),
+                        TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey),
+                            ),
+                            labelText: 'Search Books',
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.search),
+                              onPressed: () {
+                                homeController
+                                    .searchBooks(_searchController.text)
+                                    .then((_) {
+                                      if (homeController.books.isNotEmpty) {
+                                        Get.to(() => SearchResultScreen());
+                                      } else {
+                                        // If no results, show a snackbar or message
+                                        Get.snackbar(
+                                          'No results found',
+                                          'Try another search',
+                                        );
+                                      }
+                                    });
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 

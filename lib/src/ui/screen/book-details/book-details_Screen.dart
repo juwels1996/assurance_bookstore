@@ -180,6 +180,12 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
                 const SizedBox(height: 16),
                 Row(
+                  mainAxisAlignment: Responsive.isSmallScreen(context)
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.center,
+                  crossAxisAlignment: Responsive.isSmallScreen(context)
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
                       onTap: () {
@@ -197,7 +203,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
-                          mainAxisSize: MainAxisSize.min,
                           children: [
                             // Icon container with its own border and background
                             Container(

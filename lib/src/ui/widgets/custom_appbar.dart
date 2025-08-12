@@ -23,6 +23,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Column(
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Left side: Title
                 Column(
@@ -45,45 +46,44 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 const SizedBox(width: 20),
 
                 // Search bar
-                Expanded(
-                  child: Container(
-                    height: 38,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.search, color: Colors.grey),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Search for books",
-                              border: InputBorder.none,
-                              isCollapsed: true,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
+                // Expanded(
+                //   child: Container(
+                //     height: 38,
+                //     padding: const EdgeInsets.symmetric(horizontal: 12),
+                //     decoration: BoxDecoration(
+                //       color: Colors.grey[200],
+                //       borderRadius: BorderRadius.circular(20),
+                //     ),
+                //     child: Row(
+                //       children: const [
+                //         Icon(Icons.search, color: Colors.grey),
+                //         SizedBox(width: 8),
+                //         Expanded(
+                //           child: TextField(
+                //             decoration: InputDecoration(
+                //               hintText: "Search for books",
+                //               border: InputBorder.none,
+                //               isCollapsed: true,
+                //             ),
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(width: 16),
 
                 // Icons
                 Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.shopping_cart,
-                        color: Colors.black,
-                      ),
-                      onPressed: () {},
-                    ),
-                  ],
+                  // children: [
+                  //   IconButton(
+                  //     icon: const Icon(
+                  //       Icons.shopping_cart,
+                  //       color: Colors.black,
+                  //     ),
+                  //     onPressed: () {},
+                  //   ),
+                  // ],
                 ),
                 if (authController.isLoggedIn)
                   Padding(

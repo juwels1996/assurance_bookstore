@@ -1,3 +1,4 @@
+import 'package:assurance_bookstore/src/core/models/home/home_page_data.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
@@ -10,12 +11,24 @@ class CartItem {
   CartItem({required this.book, int quantity = 1}) : quantity = quantity.obs;
 }
 
+class CartItemHome {
+  final Book book;
+  RxInt quantity;
+
+  CartItemHome({required this.book, int quantity = 1})
+    : quantity = quantity.obs;
+}
+
 class CartController extends GetxController {
   var cartItems = <CartItem>[].obs;
+  var cartItemsHome = <CartItemHome>[].obs;
+
   String paymentMethod = 'bkash';
 
   int get totalItems =>
       cartItems.fold(0, (sum, item) => sum + item.quantity.value);
+  int get totalItemsHome =>
+      cartItemsHome.fold(0, (sum, item) => sum + item.quantity.value);
 
   void addToCart(BookDetail book) {
     final index = cartItems.indexWhere((item) => item.book.id == book.id);
@@ -23,6 +36,15 @@ class CartController extends GetxController {
       cartItems[index].quantity.value++;
     } else {
       cartItems.add(CartItem(book: book));
+    }
+  }
+
+  void addToCartHome(Book book) {
+    final index = cartItemsHome.indexWhere((item) => item.book.id == book.id);
+    if (index != -1) {
+      cartItemsHome[index].quantity.value++;
+    } else {
+      cartItemsHome.add(CartItemHome(book: book));
     }
   }
 
@@ -37,6 +59,17 @@ class CartController extends GetxController {
     }
   }
 
+  void removeFromCartHome(Book book) {
+    final index = cartItemsHome.indexWhere((item) => item.book.id == book.id);
+    if (index != -1) {
+      if (cartItemsHome[index].quantity.value > 1) {
+        cartItemsHome[index].quantity.value--;
+      } else {
+        cartItemsHome.removeAt(index);
+      }
+    }
+  }
+
   int getQuantity(BookDetail book) {
     final index = cartItems.indexWhere((item) => item.book.id == book.id);
     if (index != -1) {
@@ -45,8 +78,20 @@ class CartController extends GetxController {
     return 0;
   }
 
+  int getQuantityHome(Book book) {
+    final index = cartItemsHome.indexWhere((item) => item.book.id == book.id);
+    if (index != -1) {
+      return cartItemsHome[index].quantity.value;
+    }
+    return 0;
+  }
+
   void clearCart() {
     cartItems.clear();
+  }
+
+  void clearCartHome() {
+    cartItemsHome.clear();
   }
 
   int get totalAmount => cartItems.fold(0, (sum, item) {
