@@ -27,7 +27,13 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   final BookDetailsController controller = Get.put(BookDetailsController());
   final CartController cartController = Get.find();
 
-  final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
+  void updateBookDetails(String bookId) {
+    setState(() {
+      controller.fetchBookDetailsData(
+        bookId,
+      ); // Fetch new book data based on selected related book
+    });
+  }
 
   @override
   void initState() {
@@ -41,7 +47,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       backgroundColor: Colors.blueGrey.shade100,
       appBar: AppBar(
         backgroundColor: Colors.blueGrey.shade100,
-
         title: Text('বইয়ের বিস্তারিত'),
         actions: [
           Obx(() {
@@ -128,16 +133,11 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 const SizedBox(height: 8),
 
                 // Author
-                // Text(
-                //   'লেখক: ${book.editor ?? "অজানা"}',
-                //   style: const TextStyle(fontSize: 14, color: Colors.grey),
-                // ),
                 const SizedBox(height: 8),
 
                 // Price
                 RichText(
                   text: TextSpan(
-                    // base style
                     children: [
                       TextSpan(
                         text: 'প্রকাশনী :',
@@ -154,77 +154,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                           fontSize: 16,
                         ),
                       ),
-                      // TextSpan(
-                      //   text: '(2025)',
-                      //   style: TextStyle(
-                      //     color: Colors.red,
-                      //     fontStyle: FontStyle.italic,
-                      //   ),
-                      // ),
                     ],
                   ),
                 ),
-
-                RichText(
-                  text: TextSpan(
-                    // base style
-                    children: [
-                      TextSpan(
-                        text: 'বিষয় :',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ' চাকরি এবং নিয়োগ ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blue,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  text: TextSpan(
-                    // base style
-                    children: [
-                      TextSpan(
-                        text: 'Stock : ',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                        text: book.quantityAvailable.toString(),
-                        style: TextStyle(color: Colors.blue, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  text: TextSpan(
-                    // base style
-                    children: [
-                      TextSpan(
-                        text: 'Edition :',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                        text: " 2025",
-                        style: TextStyle(color: Colors.blue, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
 
                 // Description
                 ReadMoreText(
@@ -296,39 +228,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                       ),
                     ),
                     SizedBox(width: 15),
-
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     Get.to(
-                    //       () => BookPdfPreviewScreen(
-                    //         pdfUrl:
-                    //             "https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf",
-                    //       ),
-                    //     );
-                    //   },
-                    //   child: Container(
-                    //     padding: const EdgeInsets.symmetric(vertical: 4),
-                    //     decoration: BoxDecoration(
-                    //       color: Colors.red,
-                    //       borderRadius: BorderRadius.circular(6),
-                    //     ),
-                    //     alignment: Alignment.center,
-                    //     child: const Padding(
-                    //       padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    //       child: Row(
-                    //         children: [
-                    //           Text(
-                    //             'একটু পড়ে দেখুন',
-                    //             style: TextStyle(
-                    //               color: Colors.white,
-                    //               fontWeight: FontWeight.bold,
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
                     book.previewPdfUrl!.isNotEmpty
                         ? GestureDetector(
                             onTap: () {
@@ -477,8 +376,16 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                     scrollDirection: Axis.horizontal,
                     itemCount: book.relatedBooks?.length,
                     itemBuilder: (context, bookIndex) {
-                      return BookDetailsCard(
-                        book: book.relatedBooks![bookIndex],
+                      return GestureDetector(
+                        onTap: () {
+                          // Update the book details when a related book is tapped
+                          updateBookDetails(
+                            book.relatedBooks![bookIndex].id.toString(),
+                          );
+                        },
+                        child: BookDetailsCard(
+                          book: book.relatedBooks![bookIndex],
+                        ),
                       );
                     },
                   ),
@@ -491,87 +398,3 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     );
   }
 }
-
-// Widget buildBookDetailsCard(RelatedBook book) {
-//   return GestureDetector(
-//     onTap: () {
-//       Get.to(() => BookDetailsScreen(bookId: book.id.toString()));
-//     },
-//     child: Container(
-//       width: 140,
-//       margin: const EdgeInsets.only(left: 20, right: 8),
-//       child: Stack(
-//         children: [
-//           Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               ClipRRect(
-//                 borderRadius: BorderRadius.circular(6),
-//                 child: Image.network(
-//                   'http://192.168.68.103:8000${book.image}',
-//                   // already full path in model
-//                   fit: BoxFit.contain,
-//                   height: 120,
-//                   errorBuilder: (context, error, stackTrace) => Container(
-//                     color: Colors.grey.shade300,
-//                     child: const Center(child: Icon(Icons.broken_image)),
-//                   ),
-//                 ),
-//               ),
-//               const SizedBox(height: 12),
-//               Text(
-//                 book.title,
-//                 maxLines: 2,
-//                 overflow: TextOverflow.ellipsis,
-//                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-//               ),
-//               // const SizedBox(height: 4),
-//               // Text(
-//               //   "Juwel Sheikh",
-//               //   maxLines: 1,
-//               //   overflow: TextOverflow.ellipsis,
-//               //   style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-//               // ),
-//               const SizedBox(height: 4),
-//               Row(
-//                 children: [
-//                   const Text(
-//                     "৳৮৬০",
-//                     style: TextStyle(
-//                       color: Colors.red,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                   const SizedBox(width: 4),
-//                   Text(
-//                     "৳৯৮০",
-//                     style: TextStyle(
-//                       decoration: TextDecoration.lineThrough,
-//                       color: Colors.grey.shade600,
-//                       fontSize: 12,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ],
-//           ),
-//           Positioned(
-//             top: 0,
-//             left: 0,
-//             child: Container(
-//               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-//               decoration: BoxDecoration(
-//                 color: Colors.red,
-//                 borderRadius: BorderRadius.circular(4),
-//               ),
-//               child: const Text(
-//                 '২০% ছাড়',
-//                 style: TextStyle(color: Colors.white, fontSize: 12),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     ),
-//   );
-// }

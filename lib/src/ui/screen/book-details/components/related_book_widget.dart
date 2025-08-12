@@ -30,171 +30,163 @@ class _BookDetailsCardState extends State<BookDetailsCard> {
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
-      child: GestureDetector(
-        onTap: () {
-          Get.to(() => BookDetailsScreen(bookId: book.id.toString()));
-        },
-        child: Container(
-          width: 160,
-          height: 120,
-          margin: const EdgeInsets.only(left: 20, right: 8, bottom: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade300,
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Stack(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Book Image and Top Badges
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                        child: Image.network(
-                          Constants.imageUrl + book.image,
-                          // height: Responsive.isSmallScreen(context)
-                          //     ? MediaQuery.of(context).size.height * 0.14
-                          //     : MediaQuery.of(context).size.height * 0.12,
-                          width: double.infinity,
-                          height: Responsive.isSmallScreen(context) ? 110 : 160,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                                height: 120,
-                                color: Colors.grey.shade200,
-                                child: const Center(
-                                  child: Icon(Icons.broken_image),
-                                ),
-                              ),
+      child: Container(
+        width: 160,
+        height: 120,
+        margin: const EdgeInsets.only(left: 20, right: 8, bottom: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade300,
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Book Image and Top Badges
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                      child: Image.network(
+                        Constants.imageUrl + book.image,
+                        // height: Responsive.isSmallScreen(context)
+                        //     ? MediaQuery.of(context).size.height * 0.14
+                        //     : MediaQuery.of(context).size.height * 0.12,
+                        width: double.infinity,
+                        height: Responsive.isSmallScreen(context) ? 110 : 160,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 120,
+                          color: Colors.grey.shade200,
+                          child: const Center(child: Icon(Icons.broken_image)),
                         ),
                       ),
-                      // Discount Badge
-                      Positioned(
-                        top: 8,
-                        left: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Text(
-                            '১৫% ছাড়',
-                            style: TextStyle(color: Colors.white, fontSize: 12),
-                          ),
+                    ),
+                    // Discount Badge
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
                         ),
-                      ),
-                      // Wishlist Icon
-                      const Positioned(
-                        top: 2,
-                        right: 8,
-                        child: Icon(
-                          Icons.favorite_border,
+                        decoration: BoxDecoration(
                           color: Colors.red,
-                          size: 20,
+                          borderRadius: BorderRadius.circular(20),
                         ),
+                        child: const Text(
+                          '১৫% ছাড়',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                    ),
+                    // Wishlist Icon
+                    const Positioned(
+                      top: 2,
+                      right: 8,
+                      child: Icon(
+                        Icons.favorite_border,
+                        color: Colors.red,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Book Details
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        book.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'মুনজেরিন শহীদ',
+                        style: TextStyle(color: Colors.black54, fontSize: 8),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Text(
+                            book.discountedPrice.toString() ?? "",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 8,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            book.price.toString() ?? "",
+                            style: TextStyle(
+                              decoration: TextDecoration.lineThrough,
+                              color: Colors.grey.shade600,
+                              fontSize: 8,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
+                ),
+              ],
+            ),
 
-                  // Book Details
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          book.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'মুনজেরিন শহীদ',
-                          style: TextStyle(color: Colors.black54, fontSize: 8),
-                        ),
-                        const SizedBox(height: 2),
-                        Row(
-                          children: [
-                            const Text(
-                              '৳৮৬০',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 8,
-                              ),
-                            ),
-                            const SizedBox(width: 0),
-                            Text(
-                              '৳৯৮০',
-                              style: TextStyle(
-                                decoration: TextDecoration.lineThrough,
-                                color: Colors.grey.shade600,
-                                fontSize: 8,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              // Add to Cart Button (appears on hover)
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: AnimatedOpacity(
-                  opacity: isHovered ? 1 : 0,
-                  duration: const Duration(milliseconds: 200),
-                  child: GestureDetector(
-                    onTap: () {
-                      // cartController.addToCart("");
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(12),
-                          bottomRight: Radius.circular(12),
-                        ),
+            // Add to Cart Button (appears on hover)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: AnimatedOpacity(
+                opacity: isHovered ? 1 : 0,
+                duration: const Duration(milliseconds: 200),
+                child: GestureDetector(
+                  onTap: () {
+                    // cartController.addToCart("");
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
                       ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Add To Cart',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'Add To Cart',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -219,12 +219,15 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                 };
                 checkoutController.submitDeliveryInfo(data);
               },
-              icon: const Icon(Icons.check_circle_outline),
+              icon: const Icon(Icons.check_circle_outline, color: Colors.white),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
-                minimumSize: const Size(double.infinity, 50),
+                minimumSize: Size(double.infinity, 50),
               ),
-              label: const Text("Save Address and Continue"),
+              label: Text(
+                "Save Address and Payment With Bkash",
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
             ),
           ],
         ),
