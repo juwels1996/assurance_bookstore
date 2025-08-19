@@ -29,6 +29,7 @@ class _BookCardState extends State<BookCard> {
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
         onTap: () {
+          print("-----------ontapp------");
           Get.to(() => BookDetailsScreen(bookId: book.id.toString()));
         },
         child: Container(

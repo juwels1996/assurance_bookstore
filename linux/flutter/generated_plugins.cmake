@@ -3,6 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  open_file_linux
+  printing
   scrollable_tab_view
   syncfusion_pdfviewer_linux
   url_launcher_linux

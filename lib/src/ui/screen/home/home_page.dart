@@ -1,16 +1,13 @@
 import 'package:assurance_bookstore/src/core/helper/extension.dart';
 import 'package:assurance_bookstore/src/ui/screen/home/subbcategory-widget/subcategory_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import '../../../core/controllers/auth/auth_controller.dart';
 import '../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../../core/controllers/home/home_controller.dart';
 import '../../../core/models/home/home_page_data.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/responsive.dart';
-import '../cart-screen/cart_screen.dart';
 import 'components/banner_scroll_widget.dart';
 import 'components/book_card.dart';
 import 'components/search_result.dart';
@@ -26,7 +23,7 @@ final homeController = Get.find<HomeController>();
 final authController = Get.find<AuthController>();
 TextEditingController _searchController = TextEditingController();
 bool _isLoading = false;
-final CartController cartController = Get.find();
+// final CartController cartController = Get.find();
 
 class _HomePageState extends State<HomePage> {
   @override

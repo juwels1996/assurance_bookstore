@@ -287,12 +287,20 @@ class _CartScreenState extends State<CartScreen> {
                 onPressed: () {
                   final authController = Get.find<AuthController>();
                   if (authController.isLoggedIn) {
-                    Get.to(() => DeliveryAddressScreen());
+                    Get.to(
+                      () => DeliveryAddressScreen(
+                        paymentMethod: cartController.paymentMethod,
+                      ),
+                    );
                   } else {
                     // Go to login and after successful login, go to delivery screen
                     Get.to(() => LoginScreen())?.then((_) {
                       if (authController.isLoggedIn) {
-                        Get.to(() => DeliveryAddressScreen());
+                        Get.to(
+                          () => DeliveryAddressScreen(
+                            paymentMethod: cartController.paymentMethod,
+                          ),
+                        );
                       }
                     });
                   }

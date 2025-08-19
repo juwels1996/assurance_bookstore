@@ -1,5 +1,6 @@
 import 'package:assurance_bookstore/src/core/controllers/auth/auth_controller.dart';
 import 'package:assurance_bookstore/src/ui/screen/bkash-payment/bkash_payment_screen.dart';
+import 'package:assurance_bookstore/src/ui/screen/delivery-address/order_success_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,9 +28,14 @@ class CheckoutController extends GetxController {
 
   Future<void> submitDeliveryInfo(Map<String, dynamic> data) async {
     try {
+      final cleanedData = data.map((key, value) {
+        if (value is Rx) return MapEntry(key, value.value);
+        return MapEntry(key, value);
+      });
+
       final response = await DioConfig().dio.post(
         'save-address/',
-        data: data,
+        data: cleanedData,
         options: Options(
           headers: {
             'Authorization': 'Bearer ${Get.find<AuthController>().token.value}',
@@ -39,7 +45,6 @@ class CheckoutController extends GetxController {
 
       if (response.statusCode == 201) {
         Get.snackbar('Success', 'Address saved successfully');
-        Get.to(PaymentScreen());
       } else {
         print("Error: ${response.data}");
       }
@@ -86,6 +91,31 @@ class CheckoutController extends GetxController {
     } catch (e) {
       // Handle exception if any
       print("Error fetching saved address: $e");
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> submitOrder(
+    List<Map<String, dynamic>> cartItems,
+  ) async {
+    try {
+      final response = await DioConfig().dio.post(
+        'create-order/',
+        data: {'cart': cartItems},
+        options: Options(
+          headers: {'Authorization': 'Bearer ${authController.token.value}'},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        print("Order error: ${response.data}");
+        return null;
+      }
+    } catch (e) {
+      print("Submit order error: $e");
+      Get.snackbar('Error', 'Failed to submit order.');
       return null;
     }
   }

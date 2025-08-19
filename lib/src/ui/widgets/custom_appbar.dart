@@ -5,6 +5,7 @@ import 'package:get/get_core/src/get_main.dart';
 
 import '../../core/controllers/auth/auth_controller.dart';
 import '../screen/auth/login_screen.dart';
+import '../screen/contact-us/contact_us.dart';
 import '../screen/profile/user_profile_screen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -122,6 +123,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                             );
                             Get.offAll(() => LoginScreen());
                           },
+                        ),
+
+                        TextButton(
+                          onPressed: () {
+                            Get.to(ContactUsPage());
+                          },
+                          child: Text("Contact Us"),
                         ),
                       ],
                     ),
