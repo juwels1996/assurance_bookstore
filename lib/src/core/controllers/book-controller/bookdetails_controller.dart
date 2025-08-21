@@ -11,7 +11,8 @@ class BookDetailsController extends GetxController {
   final isSuccess = false.obs;
   final isEmpty = false.obs;
 
-  final bookDetails = Rxn<BookDetail>(); // Safe nullable observable
+  final bookDetails =
+      Rxn<BookDetail>(); // Safe nullable observable for BookDetail
 
   Future<void> fetchBookDetailsData(String bookId) async {
     isLoading.value = true;
@@ -22,8 +23,6 @@ class BookDetailsController extends GetxController {
 
       if (response.statusCode == 200 && response.data != null) {
         bookDetails.value = BookDetail.fromJson(response.data);
-
-        print("book details--------${response.data}");
       } else {
         errorMessage.value = 'Failed to load book details.';
       }

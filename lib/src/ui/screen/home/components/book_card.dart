@@ -129,7 +129,7 @@ class _BookCardState extends State<BookCard> {
                   duration: const Duration(milliseconds: 200),
                   child: GestureDetector(
                     onTap: () {
-                      cartController.addToCartHome(book);
+                      cartController.addToCart(book);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('${book.title} added to cart')),
                       );

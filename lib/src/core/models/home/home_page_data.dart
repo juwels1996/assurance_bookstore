@@ -4,9 +4,6 @@ List<HomePageData> homePageDataFromJson(String str) => List<HomePageData>.from(
   json.decode(str).map((x) => HomePageData.fromJson(x)),
 );
 
-String homePageDataToJson(List<HomePageData> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
-
 class HomePageData {
   int id;
   String name;
@@ -28,13 +25,6 @@ class HomePageData {
       json["subcategories"].map((x) => Subcategory.fromJson(x)),
     ),
   );
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "slug": slug,
-    "subcategories": List<dynamic>.from(subcategories.map((x) => x.toJson())),
-  };
 }
 
 class Subcategory {
@@ -59,14 +49,6 @@ class Subcategory {
     slug: json["slug"],
     books: List<Book>.from(json["books"].map((x) => Book.fromJson(x))),
   );
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "category": category,
-    "slug": slug,
-    "books": List<dynamic>.from(books.map((x) => x.toJson())),
-  };
 }
 
 class Book {
@@ -76,6 +58,17 @@ class Book {
   int category;
   int subcategory;
   String description;
+  String? edition;
+  String? publisher;
+  String? editor;
+  int price;
+  int discountedPrice;
+  int deliveryCharge;
+  int pages;
+  String country;
+  String language;
+  int quantityAvailable;
+  String? previewPdf;
   bool isActive;
   DateTime createdAt;
 
@@ -86,6 +79,17 @@ class Book {
     required this.category,
     required this.subcategory,
     required this.description,
+    required this.edition,
+    required this.publisher,
+    required this.editor,
+    required this.price,
+    required this.discountedPrice,
+    required this.deliveryCharge,
+    required this.pages,
+    required this.country,
+    required this.language,
+    required this.quantityAvailable,
+    required this.previewPdf,
     required this.isActive,
     required this.createdAt,
   });
@@ -97,18 +101,18 @@ class Book {
     category: json["category"],
     subcategory: json["subcategory"],
     description: json["description"],
+    edition: json["edition"],
+    publisher: json["publisher"],
+    editor: json["editor"],
+    price: json["price"],
+    discountedPrice: json["discounted_price"],
+    deliveryCharge: json["delivery_charge"],
+    pages: json["pages"],
+    country: json["country"],
+    language: json["language"],
+    quantityAvailable: json["quantity_available"],
+    previewPdf: json["preview_pdf"],
     isActive: json["is_active"],
     createdAt: DateTime.parse(json["created_at"]),
   );
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "title": title,
-    "image": image,
-    "category": category,
-    "subcategory": subcategory,
-    "description": description,
-    "is_active": isActive,
-    "created_at": createdAt.toIso8601String(),
-  };
 }

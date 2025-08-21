@@ -4,52 +4,35 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 import '../../models/book-details/book-details.dart';
 
-class CartItem {
-  final BookDetail book;
+class CartItem<T> {
+  T item; // Can be either Book or BookDetail
   RxInt quantity;
 
-  CartItem({required this.book, int quantity = 1}) : quantity = quantity.obs;
-}
-
-class CartItemHome {
-  final Book book;
-  RxInt quantity;
-
-  CartItemHome({required this.book, int quantity = 1})
-    : quantity = quantity.obs;
+  CartItem({required this.item, int quantity = 1}) : quantity = quantity.obs;
 }
 
 class CartController extends GetxController {
-  var cartItems = <CartItem>[].obs;
-  var cartItemsHome = <CartItemHome>[].obs;
+  var cartItems = <CartItem<dynamic>>[].obs; // Can handle any object type
 
   String paymentMethod = 'bkash';
 
+  // Total items in cart
   int get totalItems =>
       cartItems.fold(0, (sum, item) => sum + item.quantity.value);
-  int get totalItemsHome =>
-      cartItemsHome.fold(0, (sum, item) => sum + item.quantity.value);
 
-  void addToCart(BookDetail book) {
-    final index = cartItems.indexWhere((item) => item.book.id == book.id);
+  // Add an item to the cart (works with any model type)
+  void addToCart(dynamic item) {
+    final index = cartItems.indexWhere((cartItem) => cartItem.item == item);
     if (index != -1) {
       cartItems[index].quantity.value++;
     } else {
-      cartItems.add(CartItem(book: book));
+      cartItems.add(CartItem(item: item));
     }
   }
 
-  void addToCartHome(Book book) {
-    final index = cartItemsHome.indexWhere((item) => item.book.id == book.id);
-    if (index != -1) {
-      cartItemsHome[index].quantity.value++;
-    } else {
-      cartItemsHome.add(CartItemHome(book: book));
-    }
-  }
-
-  void removeFromCart(BookDetail book) {
-    final index = cartItems.indexWhere((item) => item.book.id == book.id);
+  // Remove an item from the cart
+  void removeFromCart(dynamic item) {
+    final index = cartItems.indexWhere((cartItem) => cartItem.item == item);
     if (index != -1) {
       if (cartItems[index].quantity.value > 1) {
         cartItems[index].quantity.value--;
@@ -59,86 +42,56 @@ class CartController extends GetxController {
     }
   }
 
-  void removeFromCartHome(Book book) {
-    final index = cartItemsHome.indexWhere((item) => item.book.id == book.id);
-    if (index != -1) {
-      if (cartItemsHome[index].quantity.value > 1) {
-        cartItemsHome[index].quantity.value--;
-      } else {
-        cartItemsHome.removeAt(index);
-      }
-    }
-  }
-
-  int getQuantity(BookDetail book) {
-    final index = cartItems.indexWhere((item) => item.book.id == book.id);
+  // Get quantity for a specific item (works with any model type)
+  int getQuantity(dynamic item) {
+    final index = cartItems.indexWhere((cartItem) => cartItem.item == item);
     if (index != -1) {
       return cartItems[index].quantity.value;
     }
     return 0;
   }
 
-  int getQuantityHome(Book book) {
-    final index = cartItemsHome.indexWhere((item) => item.book.id == book.id);
-    if (index != -1) {
-      return cartItemsHome[index].quantity.value;
-    }
-    return 0;
-  }
-
+  // Clear all items in the cart
   void clearCart() {
     cartItems.clear();
   }
 
-  void clearCartHome() {
-    cartItemsHome.clear();
-  }
-
+  // Total amount of all items (works with any model type)
   int get totalAmount => cartItems.fold(0, (sum, item) {
-    final price = item.book.discountedPrice ?? item.book.price ?? 0;
-    return sum + (price * item.quantity.value);
+    final price = item.item is Book
+        ? (item.item as Book).discountedPrice ?? (item.item as Book).price
+        : (item.item as BookDetail).discountedPrice ??
+              (item.item as BookDetail).price;
+    return sum + (price! * item.quantity.value);
   });
 
-  int get totalPrice => cartItems.fold(0, (sum, item) {
-    final price = item.book.discountedPrice ?? item.book.price ?? 0;
-    return sum + (price * item.quantity.value);
-  });
-
+  // Total delivery charge (works with any model type)
   int get totalDeliveryCharge {
     int totalCharge = 0;
-    int totalBooks = cartItems.fold(
+    int totalItems = cartItems.fold(
       0,
       (sum, item) => sum + item.quantity.value,
     );
 
     for (var item in cartItems) {
-      final deliveryCharge = item.book.deliveryCharge ?? 0;
+      final deliveryCharge = item.item is Book
+          ? (item.item as Book).deliveryCharge
+          : (item.item as BookDetail).deliveryCharge;
 
-      // Logic for COD (Cash on Delivery)
       if (paymentMethod == 'cod') {
-        if (totalBooks == 1) {
-          // For the first book: Initial delivery charge from backend + 40
-          totalCharge += deliveryCharge + 40;
-        } else if (totalBooks == 2) {
-          // For the second book: Initial delivery charge from backend + 40 for 1st book + 40 for 2nd book
-          totalCharge += deliveryCharge + 40 + 40;
-        } else if (totalBooks > 2) {
-          // For more than 2 books: Initial delivery charge from backend + 40 for first two books + 20 for each additional book
-          totalCharge += deliveryCharge + 40 + 40 + (totalBooks - 2) * 20;
-        }
-      }
-      // Logic for other payment methods (bKash or regular)
-      else {
-        if (totalBooks == 1) {
-          // For the first book: Only the delivery charge from backend
-          totalCharge += deliveryCharge;
-        } else if (totalBooks == 2) {
-          // For the second book: Initial delivery charge from backend + 40
-          totalCharge += deliveryCharge + 40;
-        } else if (totalBooks > 2) {
-          // For more than 2 books: Add 20 Taka for each additional book
-          totalCharge += deliveryCharge + 40 + (totalBooks - 2) * 20;
-        }
+        if (totalItems == 1)
+          totalCharge += (deliveryCharge! + 40)!;
+        else if (totalItems == 2)
+          totalCharge += deliveryCharge! + 40 + 40;
+        else if (totalItems > 2)
+          totalCharge += deliveryCharge! + 40 + 40 + (totalItems - 2) * 20;
+      } else {
+        if (totalItems == 1)
+          totalCharge += deliveryCharge!;
+        else if (totalItems == 2)
+          totalCharge += (deliveryCharge! + 40)!;
+        else if (totalItems > 2)
+          totalCharge += deliveryCharge! + 40 + (totalItems - 2) * 20;
       }
     }
 

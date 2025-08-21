@@ -1,5 +1,6 @@
 import 'package:assurance_bookstore/src/core/controllers/cart-controller/cart_controller.dart';
 import 'package:assurance_bookstore/src/core/helper/extension.dart';
+import 'package:assurance_bookstore/src/core/models/home/home_page_data.dart';
 import 'package:assurance_bookstore/src/ui/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +11,7 @@ import '../../../../core/models/book-details/book-details.dart';
 import '../book-details_Screen.dart';
 
 class BookDetailsCard extends StatefulWidget {
-  final RelatedBook book;
+  final Book book;
 
   const BookDetailsCard({Key? key, required this.book}) : super(key: key);
 
@@ -163,7 +164,7 @@ class _BookDetailsCardState extends State<BookDetailsCard> {
                 duration: const Duration(milliseconds: 200),
                 child: GestureDetector(
                   onTap: () {
-                    // cartController.addToCart("");
+                    cartController.addToCart(book);
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),

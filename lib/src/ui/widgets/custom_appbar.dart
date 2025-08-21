@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 import '../../core/controllers/auth/auth_controller.dart';
+import '../../core/controllers/cart-controller/cart_controller.dart';
 import '../screen/auth/login_screen.dart';
+import '../screen/cart-screen/cart_screen.dart';
 import '../screen/contact-us/contact_us.dart';
 import '../screen/profile/user_profile_screen.dart';
 
@@ -15,6 +17,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
+    final CartController cartController = Get.find();
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 1,
@@ -124,6 +127,43 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                             Get.offAll(() => LoginScreen());
                           },
                         ),
+                        Obx(() {
+                          return Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.shopping_cart),
+                                onPressed: () {
+                                  Get.to(
+                                    () => CartScreen(),
+                                  ); // Navigate to cart screen
+                                },
+                              ),
+                              if (cartController.totalItems > 0)
+                                Positioned(
+                                  right: 6,
+                                  top: 6,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Obx(
+                                      () => Text(
+                                        '${cartController.totalItems}',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          );
+                        }),
 
                         TextButton(
                           onPressed: () {

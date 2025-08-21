@@ -1,8 +1,10 @@
+import 'package:assurance_bookstore/src/core/models/home/home_page_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import '../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../../core/controllers/checkout-controller/checkout_controller.dart';
+import '../../../core/models/book-details/book-details.dart';
 import '../bkash-payment/bkash_payment_screen.dart';
 import 'order_success_screen.dart';
 
@@ -211,7 +213,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
-            _buildSummaryRow("Subtotal", "${cartController.totalPrice} Tk"),
+            _buildSummaryRow("Subtotal", "${cartController.totalAmount} Tk"),
             _buildSummaryRow("VAT", "0 Tk"),
             _buildSummaryRow(
               "Delivery Charge",
@@ -286,8 +288,11 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
         final cartItems = Get.find<CartController>().cartItems
             .map(
               (e) => {
-                'book_id': e.book.id,
-                'quantity': e.quantity.value, // use .value here
+                // Check if the item is of type Book or BookDetail
+                'book_id': (e.item is Book)
+                    ? (e.item as Book).id
+                    : (e.item as BookDetail).id,
+                'quantity': e.quantity.value, // Use .value here
               },
             )
             .toList();

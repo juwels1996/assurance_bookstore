@@ -75,7 +75,7 @@ class _CartScreenState extends State<CartScreen> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    "Total Product Price = ${cartController.totalPrice} Tk",
+                    "Total Product Price = ${cartController.totalAmount} Tk",
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -89,7 +89,7 @@ class _CartScreenState extends State<CartScreen> {
                 padding: const EdgeInsets.all(12),
                 itemBuilder: (context, index) {
                   final item = items[index];
-                  final book = item.book;
+                  final book = item.item;
 
                   return Card(
                     shape: RoundedRectangleBorder(

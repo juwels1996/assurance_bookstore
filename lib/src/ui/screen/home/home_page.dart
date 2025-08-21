@@ -53,44 +53,6 @@ class _HomePageState extends State<HomePage> {
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
                 children: [
-                  // Obx(() {
-                  //   return Stack(
-                  //     alignment: Alignment.topRight,
-                  //     children: [
-                  //       IconButton(
-                  //         icon: const Icon(Icons.shopping_cart),
-                  //         onPressed: () {
-                  //           Get.to(
-                  //             () => CartScreen(),
-                  //           ); // Navigate to cart screen
-                  //         },
-                  //       ),
-                  //       if (cartController.totalItemsHome > 0)
-                  //         Positioned(
-                  //           right: 6,
-                  //           top: 6,
-                  //           child: Container(
-                  //             padding: const EdgeInsets.all(4),
-                  //             decoration: BoxDecoration(
-                  //               color: Colors.red,
-                  //               shape: BoxShape.circle,
-                  //             ),
-                  //             child: Obx(
-                  //               () => Text(
-                  //                 '${cartController.totalItemsHome}',
-                  //                 style: const TextStyle(
-                  //                   fontSize: 12,
-                  //                   color: Colors.white,
-                  //                   fontWeight: FontWeight.bold,
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ),
-                  //     ],
-                  //   );
-                  // }),
-
                   // Search Field
                   Container(
                     height: 60,

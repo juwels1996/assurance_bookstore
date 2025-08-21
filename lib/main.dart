@@ -1,4 +1,5 @@
 import 'package:assurance_bookstore/src/core/controllers/auth/auth_controller.dart';
+import 'package:assurance_bookstore/src/core/controllers/book-controller/bookdetails_controller.dart';
 import 'package:assurance_bookstore/src/core/controllers/cart-controller/cart_controller.dart';
 import 'package:assurance_bookstore/src/core/controllers/checkout-controller/checkout_controller.dart';
 import 'package:assurance_bookstore/src/core/controllers/home/home_controller.dart';
@@ -13,6 +14,7 @@ void main() {
   Get.put(CartController());
   Get.put(AuthController());
   Get.put(CheckoutController());
+  Get.put(BookDetailsController());
 
   runApp(const MyApp());
 }

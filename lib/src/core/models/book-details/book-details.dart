@@ -1,3 +1,5 @@
+import 'package:assurance_bookstore/src/core/models/home/home_page_data.dart';
+
 class BookDetail {
   int id;
   String? title;
@@ -17,7 +19,7 @@ class BookDetail {
   String? previewPdfUrl;
   String? description;
   List<String>? features;
-  List<RelatedBook>? relatedBooks;
+  List<Book>? relatedBooks;
 
   BookDetail({
     required this.id,
@@ -73,33 +75,7 @@ class BookDetail {
         ? List<String>.from(json['features'])
         : [],
     relatedBooks: json['related_books'] != null
-        ? List<RelatedBook>.from(
-            json['related_books'].map((x) => RelatedBook.fromJson(x)),
-          )
+        ? List<Book>.from(json['related_books'].map((x) => Book.fromJson(x)))
         : [],
-  );
-}
-
-class RelatedBook {
-  int id;
-  String title;
-  String image;
-  int price;
-  int discountedPrice;
-
-  RelatedBook({
-    required this.id,
-    required this.title,
-    required this.image,
-    required this.price,
-    required this.discountedPrice,
-  });
-
-  factory RelatedBook.fromJson(Map<String, dynamic> json) => RelatedBook(
-    id: json['id'],
-    title: json['title'],
-    image: json['image'],
-    price: json['price'],
-    discountedPrice: json['discounted_price'],
   );
 }
