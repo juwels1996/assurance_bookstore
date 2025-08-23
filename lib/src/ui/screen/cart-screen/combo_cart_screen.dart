@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/home/banner_model.dart';
+import '../../../core/models/home/home_page_data.dart';
 
 class ComboCheckoutScreen extends StatelessWidget {
-  final List<BookModel> comboBooks;
+  final List<Book> comboBooks;
   final double totalPrice;
 
   const ComboCheckoutScreen({

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:assurance_bookstore/src/ui/screen/cart-screen/cart_screen.dart';
 import 'package:assurance_bookstore/src/ui/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/constants.dart';
+import '../../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../../../core/models/home/banner_model.dart';
 import '../../cart-screen/combo_cart_screen.dart';
 
@@ -129,13 +131,16 @@ class _AutoScrollBannersState extends State<AutoScrollBanners> {
                                 ),
                               ),
                               onPressed: () {
-                                // Navigate to combo checkout with 3 books
-                                Get.to(
-                                  () => ComboCheckoutScreen(
-                                    comboBooks: banner.comboBooks,
-                                    totalPrice: banner.comboPrice,
-                                  ),
-                                );
+                                final cartController =
+                                    Get.find<CartController>();
+
+                                // Add combo books to cart
+                                for (var book in banner.comboBooks) {
+                                  cartController.addToCart(book);
+                                }
+
+                                // Navigate to Cart Screen
+                                Get.to(() => CartScreen());
                               },
                               child: const Text(
                                 'Order Combo',

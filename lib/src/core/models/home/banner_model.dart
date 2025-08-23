@@ -1,3 +1,5 @@
+import 'home_page_data.dart';
+
 class BannerModel {
   final int id;
   final String title;
@@ -5,9 +7,9 @@ class BannerModel {
   final String description;
   final String link;
   final bool isActive;
-  List<dynamic> images;
-  List<BookModel> comboBooks; // New field for combo
-  double comboPrice; // New field for total combo price
+  final List<dynamic> images;
+  final List<Book> comboBooks;
+  final double comboPrice;
 
   BannerModel({
     required this.id,
@@ -24,44 +26,18 @@ class BannerModel {
   factory BannerModel.fromJson(Map<String, dynamic> json) {
     return BannerModel(
       id: json['id'],
-      title: json['title'],
-      image: json['image'],
-      description: json['description'],
-      link: json['link'],
-      isActive: json['is_active'],
-      images: List<dynamic>.from(json['images'].map((x) => x)),
+      title: json['title'] ?? '',
+      image: json['image'] ?? '',
+      description: json['description'] ?? '',
+      link: json['link'] ?? '',
+      isActive: json['is_active'] ?? false,
+      images: List<dynamic>.from(json['images'] ?? []),
       comboBooks:
           (json['combo_books'] as List<dynamic>?)
-              ?.map((b) => BookModel.fromJson(b))
+              ?.map((b) => Book.fromJson(b))
               .toList() ??
           [],
       comboPrice: (json['combo_price'] as num?)?.toDouble() ?? 0,
-    );
-  }
-}
-
-class BookModel {
-  final int id;
-  final String title;
-  final String image;
-  final double price;
-  final double discountedPrice;
-
-  BookModel({
-    required this.id,
-    required this.title,
-    required this.image,
-    required this.price,
-    required this.discountedPrice,
-  });
-
-  factory BookModel.fromJson(Map<String, dynamic> json) {
-    return BookModel(
-      id: json['id'],
-      title: json['title'],
-      image: json['image'],
-      price: (json['price'] as num).toDouble(),
-      discountedPrice: (json['discounted_price'] as num).toDouble(),
     );
   }
 }
