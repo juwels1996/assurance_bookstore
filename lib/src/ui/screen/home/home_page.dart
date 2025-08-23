@@ -29,8 +29,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    homeController.fetchHomeData();
-    homeController.loadBanners();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      homeController.fetchHomeData();
+      homeController.loadBanners();
+    });
   }
 
   @override

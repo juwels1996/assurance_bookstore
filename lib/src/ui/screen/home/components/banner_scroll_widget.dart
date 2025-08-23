@@ -20,6 +20,7 @@ class AutoScrollBanners extends StatefulWidget {
 
 class _AutoScrollBannersState extends State<AutoScrollBanners> {
   late PageController _pageController;
+
   int _currentPage = 0;
   Timer? _timer;
 

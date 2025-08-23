@@ -70,6 +70,7 @@ dependencies:
   printing: ^5.12.0
   open_file: ^3.5.10
   universal_html: ^2.0.10
+  get_storage:
 
 
 dev_dependencies:
