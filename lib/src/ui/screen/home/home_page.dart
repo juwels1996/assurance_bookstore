@@ -235,7 +235,6 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AutoScrollBanners(banners: homeController.banners),
-
                   ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -309,7 +308,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                   SizedBox(
                                     height: Responsive.isSmallScreen(context)
                                         ? 190
-                                        : 292,
+                                        : 252,
                                     child: ListView.builder(
                                       scrollDirection: Axis.horizontal,
                                       itemCount: sub.books.length,

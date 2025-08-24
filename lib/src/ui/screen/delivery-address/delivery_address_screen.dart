@@ -277,29 +277,53 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
           'special_instruction': noteController.text,
         };
 
-        // Check if address already saved
         final savedAddress = await checkoutController.getSavedAddress();
 
+        print("-----------------------------orsder");
+
         if (savedAddress == null) {
-          // Only save if not already saved
           await checkoutController.submitDeliveryInfo(addressData);
         }
 
         final cartItems = Get.find<CartController>().cartItems
-            .map(
-              (e) => {
-                // Check if the item is of type Book or BookDetail
-                'book_id': (e.item is Book)
-                    ? (e.item as Book).id
-                    : (e.item as BookDetail).id,
-                'quantity': e.quantity.value, // Use .value here
-              },
-            )
+            .map((e) {
+              if (e.item is Book) {
+                return {
+                  'book_id': (e.item as Book).id,
+                  'quantity': e.quantity.value,
+                };
+              } else if (e.item is BookDetail) {
+                return {
+                  'book_id': (e.item as BookDetail).id,
+                  'quantity': e.quantity.value,
+                };
+              } else if (e.item is String && e.isCombo) {
+                // combo as string
+                return {
+                  'book_id': e.item, // or you may need e.itemId if you have it
+                  'quantity': e.quantity.value,
+                };
+              } else if (e.item is Book) {
+                return {
+                  'book_id': (e.item as Book).id,
+                  'quantity': e.quantity.value,
+                };
+              } else {
+                return null; // skip unknown items
+              }
+            })
+            .where((e) => e != null)
+            .cast<Map<String, dynamic>>()
             .toList();
 
+        print("-----------------------------order2");
+
         if (widget.paymentMethod == 'cod') {
-          // Submit order directly
-          final order = await checkoutController.submitOrder(cartItems);
+          final order = await checkoutController.submitOrder(
+            cartItems.cast<Map<String, dynamic>>(),
+          );
+
+          print("---------------${cartItems}");
           if (order != null) {
             Get.snackbar(
               'Order Success',
@@ -308,15 +332,15 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
             Get.offAll(
               () =>
                   OrderSuccessScreen(orderId: order['order_id'], orderData: {}),
-            ); // redirect to success page
+            );
           }
         } else {
-          // For bKash: go to payment screen first
           final result = await Get.to(() => PaymentScreen());
 
-          // After successful payment, submit order
           if (result == true) {
-            final order = await checkoutController.submitOrder(cartItems);
+            final order = await checkoutController.submitOrder(
+              cartItems.cast<Map<String, dynamic>>(),
+            );
             if (order != null) {
               Get.snackbar(
                 'Order Success',
@@ -339,7 +363,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       label: const Text(
-        "Order Place",
+        "Order Place-------",
         style: TextStyle(fontSize: 16, color: Colors.white),
       ),
     );
@@ -353,13 +377,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   }) {
     if (label == "District" || label == "Thana") {
       final List<String> items = label == "District"
-          ? [
-              "Dhaka",
-              "Chittagong",
-              "Khulna",
-              "Rajshahi",
-              "Kishoreganj",
-            ] // ✅ include Kishoreganj
+          ? ["Dhaka", "Chittagong", "Khulna", "Rajshahi", "Kishoreganj"]
           : ["Mirpur", "Gulshan", "Banani", "Dhanmondi"];
 
       // only use controller.text if it matches one of the items
@@ -383,7 +401,6 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
       );
     }
 
-    // normal textfield
     return TextFormField(
       controller: controller,
       maxLines: maxLines,

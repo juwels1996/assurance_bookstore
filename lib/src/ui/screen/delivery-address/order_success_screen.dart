@@ -41,6 +41,8 @@ class OrderSuccessScreen extends StatelessWidget {
                   fontWeight: pw.FontWeight.bold,
                 ),
               ),
+              pw.Text("Assurance Publication"),
+
               pw.SizedBox(height: 20),
               pw.Text("Customer Name: ${order['user']['name']}"),
               pw.Text("Phone: ${order['user']['phone']}"),

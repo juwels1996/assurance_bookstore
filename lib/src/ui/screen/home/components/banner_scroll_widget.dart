@@ -1,15 +1,13 @@
 import 'dart:async';
-import 'package:assurance_bookstore/src/ui/screen/cart-screen/cart_screen.dart';
-import 'package:assurance_bookstore/src/ui/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/constants.dart';
 import '../../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../../../core/models/home/banner_model.dart';
-import '../../cart-screen/combo_cart_screen.dart';
+import '../../../widgets/responsive.dart';
+import '../../cart-screen/cart_screen.dart';
 
 class AutoScrollBanners extends StatefulWidget {
   final List<BannerModel> banners;
@@ -22,7 +20,6 @@ class AutoScrollBanners extends StatefulWidget {
 
 class _AutoScrollBannersState extends State<AutoScrollBanners> {
   late PageController _pageController;
-
   int _currentPage = 0;
   Timer? _timer;
 
@@ -72,7 +69,6 @@ class _AutoScrollBannersState extends State<AutoScrollBanners> {
 
             return GestureDetector(
               onTap: () async {
-                // Normal link click
                 if (banner.link.isNotEmpty) {
                   final url = Uri.parse(banner.link);
                   if (await canLaunchUrl(url)) {
@@ -103,48 +99,67 @@ class _AutoScrollBannersState extends State<AutoScrollBanners> {
                           color: Colors.black.withOpacity(0.6),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
                           children: [
-                            Text(
-                              'Combo Offer - ${banner.comboBooks.length} Books',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                            // Show only first book image
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: Image.network(
+                                banner.comboBooks[0].image.toString(),
+                                height: 80,
+                                width: 60,
+                                fit: BoxFit.cover,
                               ),
                             ),
-                            const SizedBox(height: 5),
-                            Text(
-                              'Total Price: \$${banner.comboPrice.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                              ),
-                              onPressed: () {
-                                final cartController =
-                                    Get.find<CartController>();
+                            const SizedBox(width: 12),
+                            // Combo info & button
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Combo Offer - ${banner.comboBooks.length} Books',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    'Total Price: \$${banner.comboPrice.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      final cartController =
+                                          Get.find<CartController>();
 
-                                // Add combo books to cart
-                                for (var book in banner.comboBooks) {
-                                  cartController.addToCart(book);
-                                }
+                                      // Add all combo books to cart
 
-                                // Navigate to Cart Screen
-                                Get.to(() => CartScreen());
-                              },
-                              child: const Text(
-                                'Order Combo',
-                                style: TextStyle(color: Colors.white),
+                                      cartController.addComboToCart(
+                                        banner.comboBooks,
+                                      );
+
+                                      // Navigate to Cart Screen
+                                      Get.to(() => CartScreen());
+                                    },
+                                    child: const Text(
+                                      'Order Combo',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
