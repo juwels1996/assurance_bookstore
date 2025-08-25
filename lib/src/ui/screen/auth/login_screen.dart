@@ -40,52 +40,58 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      "Enter your mobile number",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: mobileController.phoneController,
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: "e.g. 016xxxxxxxx",
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Obx(
-                      () => ElevatedButton(
-                        onPressed:
-                            mobileController.otpRequestState.value ==
-                                ApiState.loading
-                            ? null
-                            : () {
-                                mobileController.requestOtp();
-                                Get.to(() => MobileOtpScreen());
-                              },
-                        child:
-                            mobileController.otpRequestState.value ==
-                                ApiState.loading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text("Send OTP"),
-                      ),
-                    ),
-                  ],
-                ),
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.stretch,
+                //   children: [
+                //     const Text(
+                //       "Enter your mobile number",
+                //       style: TextStyle(fontSize: 16),
+                //     ),
+                //     const SizedBox(height: 12),
+                //     TextField(
+                //       controller: mobileController.phoneController,
+                //       keyboardType: TextInputType.phone,
+                //       decoration: const InputDecoration(
+                //         border: OutlineInputBorder(),
+                //         hintText: "e.g. 016xxxxxxxx",
+                //       ),
+                //     ),
+                //     const SizedBox(height: 16),
+                //     Obx(
+                //       () => ElevatedButton(
+                //         onPressed:
+                //             mobileController.otpRequestState.value ==
+                //                 ApiState.loading
+                //             ? null
+                //             : () {
+                //                 mobileController.requestOtp();
+                //                 Get.to(() => MobileOtpScreen());
+                //               },
+                //         child:
+                //             mobileController.otpRequestState.value ==
+                //                 ApiState.loading
+                //             ? const SizedBox(
+                //                 height: 20,
+                //                 width: 20,
+                //                 child: CircularProgressIndicator(
+                //                   color: Colors.white,
+                //                   strokeWidth: 2,
+                //                 ),
+                //               )
+                //             : const Text("Send OTP"),
+                //       ),
+                //     ),
+                //   ],
+                // ),
 
                 // Title
-                const SizedBox(height: 30),
+                ElevatedButton(
+                  onPressed: () {
+                    Get.to(() => MobileOtpScreen());
+                  },
+                  child: Text("Login With Phone Number"),
+                ),
+                SizedBox(height: 30),
 
                 // Toggle
                 Row(
