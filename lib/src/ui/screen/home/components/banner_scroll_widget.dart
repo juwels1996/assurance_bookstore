@@ -105,7 +105,11 @@ class _AutoScrollBannersState extends State<AutoScrollBanners> {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(6),
                               child: Image.network(
-                                banner.comboBooks[0].image.toString(),
+                                // banner.comboBooks[0].image.toString(),
+                                banner.comboBooks[0].image.replaceFirst(
+                                  "http://",
+                                  "https://",
+                                ),
                                 height: 80,
                                 width: 60,
                                 fit: BoxFit.cover,
