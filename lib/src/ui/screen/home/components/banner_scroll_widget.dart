@@ -81,7 +81,7 @@ class _AutoScrollBannersState extends State<AutoScrollBanners> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
-                      banner.image,
+                      banner.image.replaceFirst("http://", "https://"),
                       fit: BoxFit.cover,
                       width: double.infinity,
                     ),

@@ -1,16 +1,13 @@
 import 'package:assurance_bookstore/src/core/models/home/home_page_data.dart';
-import 'package:assurance_bookstore/src/ui/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-
 import '../../../../core/constants/constants.dart';
 import '../../../../core/controllers/cart-controller/cart_controller.dart';
+import '../../../widgets/responsive.dart';
 import '../../book-details/book-details_Screen.dart';
 
 class BookCard extends StatefulWidget {
   final Book book;
-
   const BookCard({super.key, required this.book});
 
   @override
@@ -18,147 +15,205 @@ class BookCard extends StatefulWidget {
 }
 
 class _BookCardState extends State<BookCard> {
-  bool isHovered = false;
+  bool _hover = false;
   final CartController cartController = Get.find();
+
   @override
   Widget build(BuildContext context) {
-    final book = widget.book;
+    final b = widget.book;
+    final showCta = _hover || Responsive.isSmallScreen(context);
+    final width = Responsive.cardWidth(context);
 
     return MouseRegion(
-      onEnter: (_) => setState(() => isHovered = true),
-      onExit: (_) => setState(() => isHovered = false),
-      child: GestureDetector(
-        onTap: () {
-          print("-----------ontapp------");
-          Get.to(() => BookDetailsScreen(bookId: book.id.toString()));
-        },
-        child: Container(
-          width: Responsive.isSmallScreen(context) ? 110 : 150,
-          height: Responsive.isSmallScreen(context) ? 100 : 150,
-          margin: const EdgeInsets.only(left: 12, right: 0, bottom: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade300,
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Stack(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOut,
+        width: width,
+        margin: const EdgeInsets.only(left: 12, bottom: 4),
+        transform: Matrix4.identity()..translate(0.0, _hover ? -2.0 : 0.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: _hover ? Colors.black.withOpacity(0.06) : Colors.black12,
+              blurRadius: _hover ? 16 : 10,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Material(
+          color: Colors.white,
+          child: InkWell(
+            onTap: () =>
+                Get.to(() => BookDetailsScreen(bookId: b.id.toString())),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // IMAGE
+                Stack(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: Image.network(
-                        Constants.imageUrl + book.image,
-                        fit: BoxFit.contain,
-                        scale: Responsive.isSmallScreen(context) ? 0.9 : 0.6,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.grey.shade300,
-                          child: const Center(child: Icon(Icons.broken_image)),
+                    AspectRatio(
+                      aspectRatio: Responsive.cardImageAspect(context),
+                      child: Container(
+                        color: const Color(0xFFF6F7F9),
+                        alignment: Alignment.center,
+                        child: Image.network(
+                          '${Constants.imageUrl}${b.image}',
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) =>
+                              const Icon(Icons.broken_image_rounded),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      book.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: Responsive.isSmallScreen(context) ? 10 : 14,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          "৳৮৬০,",
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    // Discount ribbon (show if discount>0, else remove)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
                         ),
-                        const SizedBox(width: 4),
-                        // if (book.discountedPrice != null &&
-                        //     book.discountedPrice != book.price)
-                        Text(
-                          "৳8১০,",
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          '২৫% ছাড়',
                           style: TextStyle(
-                            decoration: TextDecoration.lineThrough,
-                            color: Colors.grey.shade600,
-                            fontSize: 12,
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-              // if (book.discountPercent != null && book.discountPercent! > 0)
-              Positioned(
-                top: 0,
-                left: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    '২৫% ছাড়',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: AnimatedOpacity(
-                  opacity: isHovered ? 1 : 0,
-                  duration: const Duration(milliseconds: 200),
-                  child: GestureDetector(
-                    onTap: () {
-                      cartController.addToCart(book);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('${book.title} added to cart')),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(12),
-                          bottomRight: Radius.circular(12),
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Add To Cart',
+
+                // CONTENT
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // title
+                      Text(
+                        b.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
+                          fontSize: Responsive.titleSize(context),
+                          height: 1.2,
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 6),
+
+                      // price row
+                      Row(
+                        children: [
+                          Text(
+                            '৳৮৬০',
+                            style: TextStyle(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.w700,
+                              fontSize: Responsive.priceSize(context),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '৳৮১০',
+                            style: TextStyle(
+                              decoration: TextDecoration.lineThrough,
+                              color: Colors.grey.shade500,
+                              fontSize: Responsive.priceSize(context) - 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+
+                // CTA
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  height: showCta ? 60 : 0,
+                  curve: Curves.easeOut,
+                  child: showCta
+                      ? InkWell(
+                          onTap: () {
+                            cartController.addToCart(b);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${b.title} added to cart'),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              color: Colors.black87,
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(14),
+                                bottomRight: Radius.circular(14),
+                              ),
+                            ),
+                            child: const Text(
+                              'Add To Cart',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+class Responsive {
+  static const double smallMax = 600;
+  static const double mediumMax = 800;
+
+  static bool isLargeScreen(BuildContext context) =>
+      MediaQuery.of(context).size.width >= mediumMax;
+  static bool isMediumScreen(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
+    return w >= smallMax && w < mediumMax;
+  }
+
+  static bool isSmallScreen(BuildContext context) =>
+      MediaQuery.of(context).size.width < smallMax;
+
+  static double cardWidth(BuildContext ctx) =>
+      isLargeScreen(ctx) ? 180 : (isMediumScreen(ctx) ? 140 : 150);
+
+  static double cardImageAspect(BuildContext ctx) =>
+      isLargeScreen(ctx) ? 3 / 4 : 2.8 / 4;
+
+  static double titleSize(BuildContext ctx) => isSmallScreen(ctx) ? 12 : 14;
+
+  static double priceSize(BuildContext ctx) => isSmallScreen(ctx) ? 12 : 13;
+
+  static EdgeInsets sectionHPad(BuildContext ctx) =>
+      EdgeInsets.symmetric(horizontal: isSmallScreen(ctx) ? 12 : 16);
+
+  static double carouselHeight(BuildContext context) =>
+      isLargeScreen(context) ? 440 : 240;
+
+  static double carouselAspectRatio(BuildContext context) =>
+      isLargeScreen(context) ? 16 / 9 : 4 / 3;
 }

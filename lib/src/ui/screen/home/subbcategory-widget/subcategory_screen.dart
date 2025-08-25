@@ -5,7 +5,7 @@ import 'dart:convert';
 import '../../../../core/constants/constants.dart';
 import '../../../../core/models/home/home_page_data.dart';
 import '../../../widgets/responsive.dart';
-import '../components/book_card.dart';
+import '../components/book_card.dart' hide Responsive;
 
 class SubcategoryScreen extends StatefulWidget {
   final String subcategoryId;

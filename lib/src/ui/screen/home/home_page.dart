@@ -9,7 +9,7 @@ import '../../../core/models/home/home_page_data.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/responsive.dart';
 import 'components/banner_scroll_widget.dart';
-import 'components/book_card.dart';
+import 'components/book_card.dart' hide Responsive;
 import 'components/search_result.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,7 +23,6 @@ final homeController = Get.find<HomeController>();
 final authController = Get.find<AuthController>();
 TextEditingController _searchController = TextEditingController();
 bool _isLoading = false;
-// final CartController cartController = Get.find();
 
 class _HomePageState extends State<HomePage> {
   @override
