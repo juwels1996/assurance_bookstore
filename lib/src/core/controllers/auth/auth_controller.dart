@@ -13,9 +13,11 @@ class AuthController extends GetxController {
   var token = ''.obs;
   var username = ''.obs;
   var emailname = ''.obs;
+  final phone = "".obs;
   var refreshToken = ''.obs;
 
   final emailController = TextEditingController();
+  final phoneController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
@@ -127,24 +129,38 @@ class AuthController extends GetxController {
     refreshToken.value = '';
   }
 
-  void checkAuthStatus() async {
+  Future<void> checkAuthStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final savedToken = prefs.getString('token');
     final savedUsername = prefs.getString('username');
     final savedUserEmail = prefs.getString('emailname');
 
-    print('Saved token: $savedToken'); // Debugging line
-    print('Saved username: $savedUsername');
-    print("Saved emailname: $emailname"); // Debugging line
     if (savedToken != null && savedToken.isNotEmpty) {
       token.value = savedToken;
-      isAuthenticated.value = true;
       username.value = savedUsername ?? '';
+      isAuthenticated.value = true;
       print('User is authenticated');
     } else {
       token.value = '';
       isAuthenticated.value = false;
       print('User is not authenticated');
     }
+  }
+
+  Future<void> setAuthData(
+    String tokenValue,
+    String usernameValue,
+    String emailValue,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', tokenValue);
+    await prefs.setString('username', usernameValue);
+    await prefs.setString('emailname', emailValue);
+
+    token.value = tokenValue;
+    username.value = usernameValue;
+    isAuthenticated.value = true;
+
+    print("Auth data saved-------------: $tokenValue");
   }
 }

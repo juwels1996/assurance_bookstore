@@ -10,6 +10,7 @@ import '../../widgets/custom_appbar.dart';
 import '../../widgets/responsive.dart';
 import 'components/banner_scroll_widget.dart';
 import 'components/book_card.dart' hide Responsive;
+import 'components/bottom_footer.dart';
 import 'components/search_result.dart';
 
 class HomePage extends StatefulWidget {
@@ -100,6 +101,11 @@ class _HomePageState extends State<HomePage> {
                   ),
 
                   buildCategoryList(homeController.homePageData.value, context),
+
+                  // Padding(
+                  //   padding: const EdgeInsets.only(top: 20),
+                  //   child: BottomFooter(),
+                  // ),
                 ],
               ),
             ),

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:assurance_bookstore/src/core/controllers/auth/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -24,6 +25,8 @@ class MobileOtpScreen extends StatefulWidget {
 class _MobileOtpScreenState extends State<MobileOtpScreen>
     with SingleTickerProviderStateMixin {
   final MobileAuthController controller = Get.put(MobileAuthController());
+
+  final AuthController controllers = Get.put(AuthController());
 
   final List<TextEditingController> otpControllers = List.generate(
     6,

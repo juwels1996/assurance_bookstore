@@ -99,9 +99,10 @@ class CheckoutController extends GetxController {
     List<Map<String, dynamic>> cartItems,
   ) async {
     try {
+      final savedAddress = await getSavedAddress();
       final response = await DioConfig().dio.post(
         'create-order/',
-        data: {'cart': cartItems},
+        data: {'cart': cartItems, 'delivery_address': savedAddress},
         options: Options(
           headers: {'Authorization': 'Bearer ${authController.token.value}'},
         ),

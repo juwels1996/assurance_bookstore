@@ -232,6 +232,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                         ),
                       ),
                     ),
+
                     SizedBox(width: 15),
                     book.previewPdfUrl!.isNotEmpty
                         ? GestureDetector(
@@ -291,77 +292,117 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 SizedBox(height: 4),
 
                 // Action Buttons
-                Obx(() {
-                  int quantity = cartController.getQuantity(book);
+                Row(
+                  children: [
+                    Obx(() {
+                      int quantity = cartController.getQuantity(book);
 
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: const Color(
-                        0xFFF5F6FA,
-                      ), // light background like screenshot
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Decrement Button
-                        GestureDetector(
-                          onTap: () => cartController.removeFromCart(book),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: const BoxDecoration(
-                              color: Colors.red, // Light gray
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(4),
-                                bottomLeft: Radius.circular(4),
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: const Color(
+                            0xFFF5F6FA,
+                          ), // light background like screenshot
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Decrement Button
+                            GestureDetector(
+                              onTap: () => cartController.removeFromCart(book),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red, // Light gray
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(4),
+                                    bottomLeft: Radius.circular(4),
+                                  ),
+                                ),
+                                child: const Icon(Icons.remove, size: 18),
                               ),
                             ),
-                            child: const Icon(Icons.remove, size: 18),
-                          ),
-                        ),
 
-                        // Quantity Text
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          color: Colors.white,
-                          child: Text(
-                            '$quantity',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-
-                        // Increment Button
-                        GestureDetector(
-                          onTap: () => cartController.addToCart(book),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: const BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(4),
-                                bottomRight: Radius.circular(4),
+                            // Quantity Text
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              color: Colors.white,
+                              child: Text(
+                                '$quantity',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                            child: const Icon(Icons.add, size: 18),
-                          ),
+
+                            // Increment Button
+                            GestureDetector(
+                              onTap: () => cartController.addToCart(book),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: const BoxDecoration(
+                                  color: Colors.green,
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(4),
+                                    bottomRight: Radius.circular(4),
+                                  ),
+                                ),
+                                child: const Icon(Icons.add, size: 18),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      );
+                    }),
+                    SizedBox(width: 12),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          // Add the book to cart
+                          cartController.addToCart(book);
+                        });
+
+                        // Navigate to Cart/Checkout screen
+                        Get.to(() => CartScreen());
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade400, // Buy Now button color
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Icon container with its own border and background
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Buy Now',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  );
-                }),
+                  ],
+                ),
 
                 SizedBox(height: 50),
 

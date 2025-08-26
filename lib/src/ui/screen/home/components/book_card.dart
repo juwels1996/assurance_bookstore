@@ -143,7 +143,7 @@ class _BookCardState extends State<BookCard> {
                 // CTA
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
-                  height: showCta ? 60 : 0,
+                  height: showCta ? 40 : 0,
                   curve: Curves.easeOut,
                   child: showCta
                       ? InkWell(
@@ -202,7 +202,7 @@ class Responsive {
       isLargeScreen(ctx) ? 180 : (isMediumScreen(ctx) ? 140 : 150);
 
   static double cardImageAspect(BuildContext ctx) =>
-      isLargeScreen(ctx) ? 3 / 4 : 2.8 / 4;
+      isLargeScreen(ctx) ? 5.3 / 4 : 5.2 / 4;
 
   static double titleSize(BuildContext ctx) => isSmallScreen(ctx) ? 12 : 14;
 

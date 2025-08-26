@@ -1,17 +1,14 @@
+import 'dart:io';
 import 'package:assurance_bookstore/src/core/configuration/dioconfig.dart';
 import 'package:assurance_bookstore/src/ui/screen/home/home_page.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:printing/printing.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter/foundation.dart';
-import 'package:universal_html/html.dart';
-import '../../../core/controllers/auth/auth_controller.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
+import '../../../core/controllers/auth/auth_controller.dart';
 
 class OrderSuccessScreen extends StatelessWidget {
   final int orderId;
@@ -25,59 +22,6 @@ class OrderSuccessScreen extends StatelessWidget {
     required this.orderData,
   });
 
-  Future<void> generateInvoice(Map<String, dynamic> order) async {
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text(
-                "Invoice #${order['order_id']}",
-                style: pw.TextStyle(
-                  fontSize: 24,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.Text("Assurance Publication"),
-
-              pw.SizedBox(height: 20),
-              pw.Text("Customer Name: ${order['user']['name']}"),
-              pw.Text("Phone: ${order['user']['phone']}"),
-              pw.Text("Address: ${order['user']['address']}"),
-              pw.SizedBox(height: 20),
-              pw.Text(
-                "Items:",
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-              ),
-              ...order['items'].map<pw.Widget>((item) {
-                return pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text("${item['book']['title']} x ${item['quantity']}"),
-                    pw.Text("${item['price']} BDT"),
-                  ],
-                );
-              }).toList(),
-              pw.Divider(),
-              pw.Align(
-                alignment: pw.Alignment.centerRight,
-                child: pw.Text(
-                  "Total: ${order['total_price']} BDT",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-
-    await Printing.layoutPdf(onLayout: (format) async => pdf.save());
-  }
-
   Future<void> downloadInvoice(int orderId) async {
     try {
       final token = Get.find<AuthController>().token.value;
@@ -86,14 +30,12 @@ class OrderSuccessScreen extends StatelessWidget {
         'order-invoice/$orderId/',
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
-          responseType: ResponseType.bytes,
+          responseType: ResponseType.bytes, // ✅ Expect binary PDF
         ),
       );
 
-      print("---------------${response}");
-
       if (kIsWeb) {
-        // For web: trigger browser download
+        // ✅ For web: trigger browser download
         final blob = html.Blob([response.data], 'application/pdf');
         final url = html.Url.createObjectUrlFromBlob(blob);
         final anchor = html.AnchorElement(href: url)
@@ -101,11 +43,15 @@ class OrderSuccessScreen extends StatelessWidget {
           ..click();
         html.Url.revokeObjectUrl(url);
       } else {
-        // For mobile: save to file and open
+        // ✅ For mobile: save to file and open
+        final dir = await getApplicationDocumentsDirectory();
+        final file = File('${dir.path}/invoice_$orderId.pdf');
+        await file.writeAsBytes(response.data, flush: true);
+        await OpenFile.open(file.path);
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to download invoice');
-      print(e);
+      print("❌ Invoice download error: $e");
     }
   }
 
@@ -124,7 +70,11 @@ class OrderSuccessScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.check_circle_outline, size: 100, color: Colors.green),
+              const Icon(
+                Icons.check_circle_outline,
+                size: 100,
+                color: Colors.green,
+              ),
               const SizedBox(height: 24),
               const Text(
                 'Your order has been placed successfully!',
@@ -168,7 +118,7 @@ class OrderSuccessScreen extends StatelessWidget {
                   ),
                 ),
                 child: const Text(
-                  'View My Orders',
+                  'Download Invoice',
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),

@@ -1,14 +1,12 @@
-import 'package:assurance_bookstore/src/ui/screen/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-
 import '../../core/controllers/auth/auth_controller.dart';
 import '../../core/controllers/cart-controller/cart_controller.dart';
-import '../screen/auth/login_screen.dart';
 import '../screen/cart-screen/cart_screen.dart';
 import '../screen/contact-us/contact_us.dart';
 import '../screen/profile/user_profile_screen.dart';
+import '../screen/home/home_page.dart';
+import '../screen/auth/login_screen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -17,19 +15,22 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
-    final CartController cartController = Get.find();
+    final CartController cartController = Get.find<CartController>();
+
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 1,
+      leading: Image.asset(height: 40, width: 60, "assets/images/logo.jpeg"),
       titleSpacing: 0,
       title: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Column(
           children: [
+            const SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Left side: Title
+                // App Title
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
@@ -49,158 +50,82 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 const SizedBox(width: 20),
 
-                // Search bar
-                // Expanded(
-                //   child: Container(
-                //     height: 38,
-                //     padding: const EdgeInsets.symmetric(horizontal: 12),
-                //     decoration: BoxDecoration(
-                //       color: Colors.grey[200],
-                //       borderRadius: BorderRadius.circular(20),
-                //     ),
-                //     child: Row(
-                //       children: const [
-                //         Icon(Icons.search, color: Colors.grey),
-                //         SizedBox(width: 8),
-                //         Expanded(
-                //           child: TextField(
-                //             decoration: InputDecoration(
-                //               hintText: "Search for books",
-                //               border: InputBorder.none,
-                //               isCollapsed: true,
-                //             ),
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
-                const SizedBox(width: 16),
-
-                // Icons
-                Row(
-                  // children: [
-                  //   IconButton(
-                  //     icon: const Icon(
-                  //       Icons.shopping_cart,
-                  //       color: Colors.black,
-                  //     ),
-                  //     onPressed: () {},
-                  //   ),
-                  // ],
-                ),
-                if (authController.isLoggedIn)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: const Icon(Icons.home, color: Colors.black),
-                          onPressed: () {
-                            // Use Future.delayed to avoid rebuild during navigation
-                            Future.delayed(Duration(milliseconds: 500), () {
-                              Get.offAll(
-                                () => HomePage(),
-                              ); // Navigate to Home Screen
-                            });
-                          },
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Get.to(() => ProfileScreen());
-                          },
-                          child: Text(
-                            "Hello, ${authController.username.value}",
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.logout, color: Colors.black),
-                          onPressed: () async {
-                            await authController.logout();
-                            Get.snackbar(
-                              "Logged Out",
-                              "You have successfully logged out.",
-                              backgroundColor: Colors.green.shade100,
-                            );
-                            Get.offAll(() => LoginScreen());
-                          },
-                        ),
-                        Obx(() {
-                          return Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.shopping_cart),
-                                onPressed: () {
-                                  Get.to(
-                                    () => CartScreen(),
-                                  ); // Navigate to cart screen
-                                },
+                // User info & actions
+                Obx(() {
+                  // Reactive update for logged-in state
+                  return Row(
+                    children: [
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => Get.to(() => ProfileScreen()),
+                            child: Text(
+                              "Hello, ${authController.username.value.isNotEmpty ? authController.username.value : 'User'}",
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
                               ),
-                              if (cartController.totalItems > 0)
-                                Positioned(
-                                  right: 6,
-                                  top: 6,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Obx(
-                                      () => Text(
-                                        '${cartController.totalItems}',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.logout, color: Colors.black),
+                            onPressed: () async {
+                              await authController.logout();
+                              Get.snackbar(
+                                "Logged Out",
+                                "You have successfully logged out.",
+                                backgroundColor: Colors.green.shade100,
+                              );
+                              Get.offAll(() => LoginScreen());
+                            },
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(width: 10),
+                      // Cart icon with badge
+                      Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.shopping_cart),
+                            onPressed: () => Get.to(() => CartScreen()),
+                          ),
+                          if (cartController.totalItems > 0)
+                            Positioned(
+                              right: 6,
+                              top: 6,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Obx(
+                                  () => Text(
+                                    '${cartController.totalItems}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
-                            ],
-                          );
-                        }),
-
-                        TextButton(
-                          onPressed: () {
-                            Get.to(ContactUsPage());
-                          },
-                          child: Text("Contact Us"),
-                        ),
-                      ],
-                    ),
-                  ),
-                // If not logged in, show the login button
-                if (!authController.isLoggedIn)
-                  IconButton(
-                    icon: const Icon(Icons.login, color: Colors.black),
-                    onPressed: () {
-                      Get.to(() => LoginScreen());
-                    },
-                  ),
-                // Phone number button
-                // TextButton.icon(
-                //   style: TextButton.styleFrom(
-                //     backgroundColor: Colors.grey[300],
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(8),
-                //     ),
-                //   ),
-                //   onPressed: () {},
-                //   icon: const Icon(Icons.phone, color: Colors.black),
-                //   label: const Text(
-                //     "01323-112233",
-                //     style: TextStyle(color: Colors.black),
-                //   ),
-                // ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      TextButton(
+                        onPressed: () => Get.to(() => ContactUsPage()),
+                        child: const Text("Contact Us"),
+                      ),
+                    ],
+                  );
+                }),
               ],
             ),
-            SizedBox(height: 8),
-            Divider(
+            const SizedBox(height: 8),
+            const Divider(
               endIndent: 5,
               indent: 5,
               thickness: 0.6,

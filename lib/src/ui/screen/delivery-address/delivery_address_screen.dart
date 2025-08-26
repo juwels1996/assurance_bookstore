@@ -285,36 +285,28 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
           await checkoutController.submitDeliveryInfo(addressData);
         }
 
-        final cartItems = Get.find<CartController>().cartItems
-            .map((e) {
-              if (e.item is Book) {
-                return {
-                  'book_id': (e.item as Book).id,
-                  'quantity': e.quantity.value,
-                };
-              } else if (e.item is BookDetail) {
-                return {
-                  'book_id': (e.item as BookDetail).id,
-                  'quantity': e.quantity.value,
-                };
-              } else if (e.item is String && e.isCombo) {
-                // combo as string
-                return {
-                  'book_id': e.item, // or you may need e.itemId if you have it
-                  'quantity': e.quantity.value,
-                };
-              } else if (e.item is Book) {
-                return {
-                  'book_id': (e.item as Book).id,
-                  'quantity': e.quantity.value,
-                };
-              } else {
-                return null; // skip unknown items
-              }
-            })
-            .where((e) => e != null)
-            .cast<Map<String, dynamic>>()
-            .toList();
+        final cartItems = Get.find<CartController>().cartItems.expand((e) {
+          if (e.item is Book) {
+            return [
+              {'book_id': (e.item as Book).id, 'quantity': e.quantity.value},
+            ];
+          } else if (e.item is BookDetail) {
+            return [
+              {
+                'book_id': (e.item as BookDetail).id,
+                'quantity': e.quantity.value,
+              },
+            ];
+          } else if (e.isCombo && e.comboBooks != null) {
+            return e.comboBooks!
+                .map(
+                  (book) => {'book_id': book.id, 'quantity': e.quantity.value},
+                )
+                .toList();
+          } else {
+            return [];
+          }
+        }).toList();
 
         print("-----------------------------order2");
 
@@ -349,7 +341,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
               Get.offAll(
                 () => OrderSuccessScreen(
                   orderId: order['order_id'],
-                  orderData: {},
+                  orderData: order,
                 ),
               );
             }
