@@ -49,65 +49,61 @@ class _HomePageState extends State<HomePage> {
         } else {
           return RefreshIndicator(
             onRefresh: () async {
-              await homeController.fetchHomeData(); // call your API
+              await homeController.fetchHomeData(); // refresh API
             },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  // Search Field
-                  Container(
-                    height: 60,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 8),
-                        TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
-                            ),
-                            labelText: 'Search Books',
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.search),
-                              onPressed: () {
-                                homeController
-                                    .searchBooks(_searchController.text)
-                                    .then((_) {
-                                      if (homeController.books.isNotEmpty) {
-                                        Get.to(() => SearchResultScreen());
-                                      } else {
-                                        // If no results, show a snackbar or message
-                                        Get.snackbar(
-                                          'No results found',
-                                          'Try another search',
-                                        );
-                                      }
-                                    });
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
+            child: Column(
+              children: [
+                // Search Field
+                Container(
+                  height: 60,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      labelText: 'Search Books',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: () {
+                          homeController
+                              .searchBooks(_searchController.text)
+                              .then((_) {
+                                if (homeController.books.isNotEmpty) {
+                                  Get.to(() => SearchResultScreen());
+                                } else {
+                                  Get.snackbar(
+                                    'No results found',
+                                    'Try another search',
+                                  );
+                                }
+                              });
+                        },
+                      ),
                     ),
                   ),
+                ),
 
-                  buildCategoryList(homeController.homePageData.value, context),
+                Expanded(
+                  child: buildCategoryList(
+                    homeController.homePageData.value,
+                    context,
+                  ),
+                ),
 
-                  // Padding(
-                  //   padding: const EdgeInsets.only(top: 20),
-                  //   child: BottomFooter(),
-                  // ),
-                ],
-              ),
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 20),
+                //   child: BottomFooter(),
+                // ),
+              ],
             ),
           );
         }
@@ -118,225 +114,217 @@ class _HomePageState extends State<HomePage> {
 
 Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
   final authController = Get.find<AuthController>();
-  return Column(
+  return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 20),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.90,
-            width: Responsive.isSmallScreen(context)
-                ? MediaQuery.of(context).size.width * 0.25
-                : MediaQuery.of(context).size.width * 0.15,
-            color: Colors.grey.shade100,
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(6.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Obx(() {
-                        if (authController.isLoggedIn) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                const SizedBox(width: 8),
-                                Column(
-                                  children: [
-                                    Text(
-                                      " Welcome",
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontStyle: FontStyle.italic,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    Text(
-                                      " ${authController.username.value}",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontStyle: FontStyle.italic,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          return Container();
-                        }
-                      }),
-
-                      Text(
-                        'বিষয়',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                ...homeController.homePageData.map((category) {
-                  return ExpansionTile(
-                    expansionAnimationStyle: AnimationStyle(
-                      curve: Curves.easeOut,
-                      duration: Duration(milliseconds: 500),
-                    ),
-                    title: SizedBox(
-                      width: Responsive.isSmallScreen(context) ? 120 : 180,
-                      child: Text(
-                        category.name,
-                        style: context.labelMedium!.copyWith(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey,
-                        ),
-                        maxLines: 1,
-                      ),
-                    ),
-                    trailing: Icon(
-                      Icons.arrow_drop_down_sharp,
-                      color: Colors.grey,
-                    ),
-                    children: category.subcategories.map((sub) {
-                      return ListTile(
-                        title: Text(
-                          sub.name,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade700,
-                          ),
-                        ),
-                        onTap: () {
-                          Get.to(
-                            () => SubcategoryScreen(
-                              subcategoryId: sub.id.toString(),
-                              subcategoryName: sub.name,
-                            ),
-                          );
-                        },
-                      );
-                    }).toList(),
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
-
-          // RIGHT Main Content (expandable)
-          Expanded(
-            child: SingleChildScrollView(
+      Container(
+        height: Get.height * 0.9,
+        width: Responsive.isSmallScreen(context)
+            ? MediaQuery.of(context).size.width * 0.25
+            : MediaQuery.of(context).size.width * 0.15,
+        color: Colors.grey.shade100,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(6.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AutoScrollBanners(banners: homeController.banners),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: categories.length,
-                    itemBuilder: (context, categoryIndex) {
-                      final category = categories[categoryIndex];
-
+                  Obx(() {
+                    if (authController.isLoggedIn) {
                       return Padding(
-                        padding: EdgeInsets.only(bottom: 16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
                           children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                                vertical: 0,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    category.name,
-                                    style: context.labelLarge!.copyWith(
-                                      fontSize:
-                                          Responsive.isSmallScreen(context)
-                                          ? 14
-                                          : 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                            const SizedBox(width: 8),
+                            Column(
+                              children: [
+                                Text(
+                                  " Welcome",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
                                   ),
-                                  TextButton(
-                                    onPressed: () {
-                                      // TODO: Navigate to "see all"
-                                    },
-                                    child: Text(
-                                      'সব দেখুন →',
-                                      style: context.labelLarge!.copyWith(
-                                        color: Colors.blueAccent,
-                                      ),
-                                    ),
+                                ),
+                                Text(
+                                  " ${authController.username.value}",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            Divider(),
-                            // Subcategories loop
-                            ...category.subcategories.map((sub) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (sub.name.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 16.0,
-                                        bottom: 2,
-                                      ),
-                                      child: Text(
-                                        sub.name,
-                                        style: context.labelLarge!.copyWith(
-                                          color: Colors.redAccent,
-                                          fontSize:
-                                              Responsive.isSmallScreen(context)
-                                              ? 12
-                                              : 14,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  SizedBox(height: 5),
-                                  SizedBox(
-                                    height: Responsive.isSmallScreen(context)
-                                        ? 190
-                                        : 252,
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: sub.books.length,
-                                      itemBuilder: (context, bookIndex) {
-                                        return BookCard(
-                                          book: sub.books[bookIndex],
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }),
                           ],
                         ),
                       );
-                    },
+                    } else {
+                      return Container();
+                    }
+                  }),
+
+                  Text(
+                    'বিষয়',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            ...homeController.homePageData.map((category) {
+              return ExpansionTile(
+                expansionAnimationStyle: AnimationStyle(
+                  curve: Curves.easeOut,
+                  duration: Duration(milliseconds: 500),
+                ),
+                title: SizedBox(
+                  width: Responsive.isSmallScreen(context) ? 120 : 180,
+                  child: Text(
+                    category.name,
+                    style: context.labelMedium!.copyWith(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey,
+                    ),
+                    maxLines: 1,
+                  ),
+                ),
+                trailing: Icon(Icons.arrow_drop_down_sharp, color: Colors.grey),
+                children: category.subcategories.map((sub) {
+                  return ListTile(
+                    title: Text(
+                      sub.name,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    onTap: () {
+                      Get.to(
+                        () => SubcategoryScreen(
+                          subcategoryId: sub.id.toString(),
+                          subcategoryName: sub.name,
+                        ),
+                      );
+                    },
+                  );
+                }).toList(),
+              );
+            }).toList(),
+          ],
+        ),
+      ),
+
+      // RIGHT Main Content (expandable)
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: categories.length + 2,
+                itemBuilder: (context, categoryIndex) {
+                  if (categoryIndex == 0) {
+                    return AutoScrollBanners(banners: homeController.banners);
+                  } else if (categoryIndex == categories.length + 1) {
+                    return BottomFooter();
+                  } else {
+                    final category = categories[categoryIndex - 1];
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  category.name,
+                                  style: context.labelLarge!.copyWith(
+                                    fontSize: Responsive.isSmallScreen(context)
+                                        ? 14
+                                        : 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    // TODO: Navigate to "see all"
+                                  },
+                                  child: Text(
+                                    'সব দেখুন →',
+                                    style: context.labelLarge!.copyWith(
+                                      color: Colors.blueAccent,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Divider(),
+                          // Subcategories loop
+                          ...category.subcategories.map((sub) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (sub.name.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 16.0,
+                                      bottom: 2,
+                                    ),
+                                    child: Text(
+                                      sub.name,
+                                      style: context.labelLarge!.copyWith(
+                                        color: Colors.redAccent,
+                                        fontSize:
+                                            Responsive.isSmallScreen(context)
+                                            ? 12
+                                            : 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                SizedBox(height: 5),
+                                SizedBox(
+                                  height: Responsive.isSmallScreen(context)
+                                      ? 190
+                                      : 252,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: sub.books.length,
+                                    itemBuilder: (context, bookIndex) {
+                                      return BookCard(
+                                        book: sub.books[bookIndex],
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
+                        ],
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     ],
   );

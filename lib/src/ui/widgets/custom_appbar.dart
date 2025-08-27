@@ -59,13 +59,22 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         children: [
                           GestureDetector(
                             onTap: () => Get.to(() => ProfileScreen()),
-                            child: Text(
-                              "Hello, ${authController.username.value.isNotEmpty ? authController.username.value : 'User'}",
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            child: Obx(() {
+                              return Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => Get.to(() => ProfileScreen()),
+                                    child: Text(
+                                      "Hello, ${authController.username.value.isNotEmpty ? authController.username.value : 'User'}",
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
                           ),
                           IconButton(
                             icon: const Icon(Icons.logout, color: Colors.black),

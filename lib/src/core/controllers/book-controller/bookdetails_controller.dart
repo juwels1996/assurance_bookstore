@@ -1,5 +1,4 @@
 import 'package:assurance_bookstore/src/core/models/book-details/book-details.dart';
-import 'package:assurance_bookstore/src/core/models/home/home_page_data.dart';
 import 'package:get/get.dart';
 import '../../configuration/dioconfig.dart';
 
@@ -11,8 +10,7 @@ class BookDetailsController extends GetxController {
   final isSuccess = false.obs;
   final isEmpty = false.obs;
 
-  final bookDetails =
-      Rxn<BookDetail>(); // Safe nullable observable for BookDetail
+  final bookDetails = Rxn<BookDetail>();
 
   Future<void> fetchBookDetailsData(String bookId) async {
     isLoading.value = true;

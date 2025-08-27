@@ -1,6 +1,9 @@
+import 'package:assurance_bookstore/src/ui/screen/cart-screen/cart_screen.dart';
+import 'package:assurance_bookstore/src/ui/screen/home/home_page.dart';
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
 import '../../../widgets/responsive.dart';
+import '../../rules_regulation/terms_condition.dart';
 
 class BottomFooter extends StatelessWidget {
   const BottomFooter({super.key});
@@ -11,18 +14,20 @@ class BottomFooter extends StatelessWidget {
     final isMedium = Responsive.isMediumScreen(context);
 
     return Container(
-      height: 300,
-
       color: Colors.grey.shade200,
       padding: const EdgeInsets.all(20),
       child: isLarge || isMedium
-          ? Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+          ? Column(
               children: [
-                _buildContactInfo(),
-                _buildPageLinks(),
-                _buildHelpLinks(),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildContactInfo(),
+                    _buildPageLinks(),
+                    _buildHelpLinks(),
+                  ],
+                ),
               ],
             )
           : Column(
@@ -46,7 +51,9 @@ class BottomFooter extends StatelessWidget {
           children: const [
             Icon(Icons.phone, size: 18),
             SizedBox(width: 8),
-            Text("+88 01313-770770"),
+            Column(
+              children: [Text("+88 01341-875192"), Text("+88 01716013899")],
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -55,11 +62,7 @@ class BottomFooter extends StatelessWidget {
           children: const [
             Icon(Icons.location_on, size: 18),
             SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                "43 Shilpacharya Zainul Abedin Sarak (Old 16 Shantinagar), Dhaka - 1217",
-              ),
-            ),
+            Text("3, New Paltan Line (2nd Floor), Azimpur, Dhaka."),
           ],
         ),
         const SizedBox(height: 8),
@@ -67,7 +70,7 @@ class BottomFooter extends StatelessWidget {
           children: const [
             Icon(Icons.email, size: 18),
             SizedBox(width: 8),
-            Text("support@pbs.com.bd"),
+            Text("assurance1996@gmail.com"),
           ],
         ),
         const SizedBox(height: 12),
@@ -75,7 +78,7 @@ class BottomFooter extends StatelessWidget {
           "Trade License :",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        const Text("TRAD/DSCC/233813/2019"),
+        const Text("TRAD/DSCC/281943/2019"),
       ],
     );
   }
@@ -83,14 +86,23 @@ class BottomFooter extends StatelessWidget {
   Widget _buildPageLinks() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text("PAGE", style: TextStyle(fontWeight: FontWeight.bold)),
         SizedBox(height: 8),
-        Text("Home"),
-        Text("Pre Order"),
-        Text("Author"),
-        Text("Publisher"),
-        Text("Book Request"),
+        GestureDetector(
+          onTap: () {
+            Get.to(HomePage());
+          },
+
+          child: Text("Home"),
+        ),
+        GestureDetector(
+          onTap: () {
+            Get.to(CartScreen());
+          },
+
+          child: Text("Product cart"),
+        ),
       ],
     );
   }
@@ -98,10 +110,15 @@ class BottomFooter extends StatelessWidget {
   Widget _buildHelpLinks() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text("HELP", style: TextStyle(fontWeight: FontWeight.bold)),
         SizedBox(height: 8),
-        Text("Terms & Condition"),
+        GestureDetector(
+          onTap: () {
+            Get.to(TermsAndConditionsScreen());
+          },
+          child: Text("Terms & Condition"),
+        ),
         Text("Privacy Policy"),
         Text("Refund & Return Policy"),
         Text("About Us"),

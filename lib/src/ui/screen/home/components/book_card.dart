@@ -118,7 +118,7 @@ class _BookCardState extends State<BookCard> {
                       Row(
                         children: [
                           Text(
-                            '৳৮৬০',
+                            b.price.toString(),
                             style: TextStyle(
                               color: Colors.green.shade700,
                               fontWeight: FontWeight.w700,
@@ -127,7 +127,7 @@ class _BookCardState extends State<BookCard> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            '৳৮১০',
+                            b.discountedPrice.toString(),
                             style: TextStyle(
                               decoration: TextDecoration.lineThrough,
                               color: Colors.grey.shade500,

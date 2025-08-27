@@ -77,7 +77,6 @@ class MobileAuthController extends GetxController {
     isBusy = false;
   }
 
-  // Verify OTP from backend
   Future<void> verifyOtp() async {
     if (isBusy) return;
     if (requestedPhoneNumber == null) {
@@ -150,12 +149,12 @@ class MobileAuthController extends GetxController {
                 icon: Icons.email,
                 keyboardType: TextInputType.emailAddress,
               ),
-              _buildInputField(
-                controller: authController.phoneController,
-                label: "Phone Number",
-                icon: Icons.phone,
-                keyboardType: TextInputType.phone,
-              ),
+              // _buildInputField(
+              //   controller: authController.phoneController,
+              //   label: "Phone Number",
+              //   icon: Icons.phone,
+              //   keyboardType: TextInputType.phone,
+              // ),
             ],
           ),
           actions: [
@@ -175,8 +174,7 @@ class MobileAuthController extends GetxController {
 
   Future<void> _updateProfile() async {
     if (authController.usernameController.text.isEmpty ||
-        authController.emailController.text.isEmpty ||
-        authController.phoneController.text.isEmpty) {
+        authController.emailController.text.isEmpty) {
       Fluttertoast.showToast(msg: "All fields are required!");
       return;
     }
@@ -199,13 +197,17 @@ class MobileAuthController extends GetxController {
         data: {
           'username': authController.usernameController.text,
           'email': authController.emailController.text,
-          'phone': authController.phoneController.text,
+          // 'phone': authController.phoneController.text,
         },
         options: Options(headers: {'Authorization': 'Bearer $savedToken'}),
       );
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Profile updated successfully");
+
+        controller.emailname(authController.emailController.text);
+        controller.username(authController.usernameController.text);
+
         Get.offAll(() => CartScreen());
       } else {
         Fluttertoast.showToast(msg: "Failed to update profile");

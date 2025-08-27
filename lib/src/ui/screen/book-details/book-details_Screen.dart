@@ -3,15 +3,12 @@ import 'package:assurance_bookstore/src/ui/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'dart:html' as html;
 import '../../../core/constants/constants.dart';
 import '../../../core/controllers/book-controller/bookdetails_controller.dart';
 import '../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../../core/models/book-details/book-details.dart';
 import '../cart-screen/cart_screen.dart';
-import '../home/home_page.dart';
-import 'components/book_preview.dart';
 import 'components/related_book_widget.dart';
 
 class BookDetailsScreen extends StatefulWidget {

@@ -132,12 +132,9 @@ class AuthController extends GetxController {
   Future<void> checkAuthStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final savedToken = prefs.getString('token');
-    final savedUsername = prefs.getString('username');
-    final savedUserEmail = prefs.getString('emailname');
 
     if (savedToken != null && savedToken.isNotEmpty) {
       token.value = savedToken;
-      username.value = savedUsername ?? '';
       isAuthenticated.value = true;
       print('User is authenticated');
     } else {
