@@ -161,6 +161,7 @@ class AuthController extends GetxController {
     username.value = usernameValue;
     isAuthenticated.value = true;
 
-    print("Auth data saved-------------: $tokenValue");
+    print("Auth data saved-------------: ${token.value}");
+    print("Auth data saved-------------: ${username.value}");
   }
 }
