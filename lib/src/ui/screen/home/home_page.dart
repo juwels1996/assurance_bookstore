@@ -243,44 +243,47 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16.0,
-                              vertical: 0,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  category.name,
-                                  style: context.labelLarge!.copyWith(
-                                    fontSize: Responsive.isSmallScreen(context)
-                                        ? 14
-                                        : 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    // TODO: Navigate to "see all"
-                                  },
-                                  child: Text(
-                                    'সব দেখুন →',
+                          if (category.subcategories.isNotEmpty)
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                                vertical: 0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    category.name,
                                     style: context.labelLarge!.copyWith(
-                                      color: Colors.blueAccent,
+                                      fontSize:
+                                          Responsive.isSmallScreen(context)
+                                          ? 14
+                                          : 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ),
-                              ],
+                                  TextButton(
+                                    onPressed: () {
+                                      // TODO: Navigate to "see all"
+                                    },
+                                    child: Text(
+                                      'সব দেখুন →',
+                                      style: context.labelLarge!.copyWith(
+                                        color: Colors.blueAccent,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
                           Divider(),
                           // Subcategories loop
                           ...category.subcategories.map((sub) {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (sub.name.isNotEmpty)
+                                if (sub.books.isNotEmpty)
                                   Padding(
                                     padding: const EdgeInsets.only(
                                       left: 16.0,

@@ -53,55 +53,54 @@ class _BookCardState extends State<BookCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // IMAGE
-                Stack(
-                  children: [
-                    AspectRatio(
-                      aspectRatio: Responsive.cardImageAspect(context),
-                      child: Container(
-                        color: const Color(0xFFF6F7F9),
-                        alignment: Alignment.center,
-                        child: Image.network(
-                          '${Constants.imageUrl}${b.image}',
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) =>
-                              const Icon(Icons.broken_image_rounded),
-                        ),
-                      ),
-                    ),
-                    // Discount ribbon (show if discount>0, else remove)
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text(
-                          '২৫% ছাড়',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
+                // IMAGE → take flexible space
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Container(
+                          color: const Color(0xFFF6F7F9),
+                          alignment: Alignment.center,
+                          child: Image.network(
+                            Constants.imageUrl + b.image,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                const Icon(Icons.broken_image_rounded),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            '২৫% ছাড়',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
-                // CONTENT
+                // CONTENT → fixed height
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+                  padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // title
                       Text(
                         b.title,
                         maxLines: 2,
@@ -109,16 +108,13 @@ class _BookCardState extends State<BookCard> {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: Responsive.titleSize(context),
-                          height: 1.2,
                         ),
                       ),
                       const SizedBox(height: 6),
-
-                      // price row
                       Row(
                         children: [
                           Text(
-                            b.price.toString(),
+                            "${b.price.toString()} টাকা",
                             style: TextStyle(
                               color: Colors.green.shade700,
                               fontWeight: FontWeight.w700,
@@ -126,24 +122,26 @@ class _BookCardState extends State<BookCard> {
                             ),
                           ),
                           const SizedBox(width: 6),
-                          Text(
-                            b.discountedPrice.toString(),
-                            style: TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: Colors.grey.shade500,
-                              fontSize: Responsive.priceSize(context) - 1,
-                            ),
-                          ),
+                          b.discountedPrice == 0
+                              ? SizedBox()
+                              : Text(
+                                  b.discountedPrice.toString(),
+                                  style: TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: Colors.grey.shade500,
+                                    fontSize: Responsive.priceSize(context) - 1,
+                                  ),
+                                ),
                         ],
                       ),
                     ],
                   ),
                 ),
 
-                // CTA
+                // CTA → fixed 36px
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
-                  height: showCta ? 40 : 0,
+                  height: showCta ? 36 : 0,
                   curve: Curves.easeOut,
                   child: showCta
                       ? InkWell(
@@ -198,22 +196,10 @@ class Responsive {
   static bool isSmallScreen(BuildContext context) =>
       MediaQuery.of(context).size.width < smallMax;
 
+  // Make card wider
   static double cardWidth(BuildContext ctx) =>
-      isLargeScreen(ctx) ? 180 : (isMediumScreen(ctx) ? 140 : 150);
+      isLargeScreen(ctx) ? 220 : (isMediumScreen(ctx) ? 180 : 160);
 
-  static double cardImageAspect(BuildContext ctx) =>
-      isLargeScreen(ctx) ? 5.3 / 4 : 5.2 / 4;
-
-  static double titleSize(BuildContext ctx) => isSmallScreen(ctx) ? 12 : 14;
-
-  static double priceSize(BuildContext ctx) => isSmallScreen(ctx) ? 12 : 13;
-
-  static EdgeInsets sectionHPad(BuildContext ctx) =>
-      EdgeInsets.symmetric(horizontal: isSmallScreen(ctx) ? 12 : 16);
-
-  static double carouselHeight(BuildContext context) =>
-      isLargeScreen(context) ? 440 : 240;
-
-  static double carouselAspectRatio(BuildContext context) =>
-      isLargeScreen(context) ? 16 / 9 : 4 / 3;
+  static double titleSize(BuildContext ctx) => isSmallScreen(ctx) ? 13 : 15;
+  static double priceSize(BuildContext ctx) => isSmallScreen(ctx) ? 13 : 14;
 }

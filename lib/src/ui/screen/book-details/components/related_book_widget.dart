@@ -26,170 +26,188 @@ class _BookDetailsCardState extends State<BookDetailsCard> {
 
   @override
   Widget build(BuildContext context) {
-    final book = widget.book;
+    final b = widget.book;
+    final showCta = isHovered || Responsive.isSmallScreen(context);
+    final width = Responsive.cardWidth(context);
 
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
-      child: Container(
-        width: 160,
-        height: 120,
-        margin: const EdgeInsets.only(left: 20, right: 8, bottom: 12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOut,
+        width: width,
+        margin: const EdgeInsets.only(left: 12, bottom: 4),
+        transform: Matrix4.identity()..translate(0.0, isHovered ? -2.0 : 0.0),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: isHovered
+                  ? Colors.black.withOpacity(0.06)
+                  : Colors.black12,
+              blurRadius: isHovered ? 16 : 10,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
-        child: Stack(
-          children: [
-            Column(
+        clipBehavior: Clip.antiAlias,
+        child: Material(
+          color: Colors.white,
+          child: InkWell(
+            onTap: () =>
+                Get.to(() => BookDetailsScreen(bookId: b.id.toString())),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Book Image and Top Badges
-                Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
-                      ),
-                      child: Image.network(
-                        Constants.imageUrl + book.image,
-                        // height: Responsive.isSmallScreen(context)
-                        //     ? MediaQuery.of(context).size.height * 0.14
-                        //     : MediaQuery.of(context).size.height * 0.12,
-                        width: double.infinity,
-                        height: Responsive.isSmallScreen(context) ? 110 : 160,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          height: 120,
-                          color: Colors.grey.shade200,
-                          child: const Center(child: Icon(Icons.broken_image)),
+                // IMAGE → take flexible space
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Container(
+                          color: const Color(0xFFF6F7F9),
+                          alignment: Alignment.center,
+                          child: Image.network(
+                            Constants.imageUrl + b.image,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                const Icon(Icons.broken_image_rounded),
+                          ),
                         ),
                       ),
-                    ),
-                    // Discount Badge
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          '১৫% ছাড়',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            '২৫% ছাড়',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    // Wishlist Icon
-                    const Positioned(
-                      top: 2,
-                      right: 8,
-                      child: Icon(
-                        Icons.favorite_border,
-                        color: Colors.red,
-                        size: 20,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
 
-                // Book Details
+                // CONTENT → fixed height
                 Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        book.title,
-                        maxLines: 1,
+                        b.title,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: Responsive.titleSize(context),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'মুনজেরিন শহীদ',
-                        style: TextStyle(color: Colors.black54, fontSize: 8),
-                      ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 6),
                       Row(
                         children: [
                           Text(
-                            book.discountedPrice.toString() ?? "",
+                            "${b.price.toString()} টাকা",
                             style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 8,
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.w700,
+                              fontSize: Responsive.priceSize(context),
                             ),
                           ),
-                          const SizedBox(width: 5),
-                          Text(
-                            book.price.toString() ?? "",
-                            style: TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: Colors.grey.shade600,
-                              fontSize: 8,
-                            ),
-                          ),
+                          const SizedBox(width: 6),
+                          b.discountedPrice == 0
+                              ? SizedBox()
+                              : Text(
+                                  b.discountedPrice.toString(),
+                                  style: TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: Colors.grey.shade500,
+                                    fontSize: Responsive.priceSize(context) - 1,
+                                  ),
+                                ),
                         ],
                       ),
                     ],
                   ),
                 ),
+
+                // CTA → fixed 36px
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  height: showCta ? 36 : 0,
+                  curve: Curves.easeOut,
+                  child: showCta
+                      ? InkWell(
+                          onTap: () {
+                            cartController.addToCart(b);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${b.title} added to cart'),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              color: Colors.black87,
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(14),
+                                bottomRight: Radius.circular(14),
+                              ),
+                            ),
+                            child: const Text(
+                              'Add To Cart',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
               ],
             ),
-
-            // Add to Cart Button (appears on hover)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: AnimatedOpacity(
-                opacity: isHovered ? 1 : 0,
-                duration: const Duration(milliseconds: 200),
-                child: GestureDetector(
-                  onTap: () {
-                    cartController.addToCart(book);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(12),
-                        bottomRight: Radius.circular(12),
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Add To Cart',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
+}
+
+class Responsive {
+  static const double smallMax = 600;
+  static const double mediumMax = 800;
+
+  static bool isLargeScreen(BuildContext context) =>
+      MediaQuery.of(context).size.width >= mediumMax;
+  static bool isMediumScreen(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
+    return w >= smallMax && w < mediumMax;
+  }
+
+  static bool isSmallScreen(BuildContext context) =>
+      MediaQuery.of(context).size.width < smallMax;
+
+  // Make card wider
+  static double cardWidth(BuildContext ctx) =>
+      isLargeScreen(ctx) ? 220 : (isMediumScreen(ctx) ? 180 : 160);
+
+  static double titleSize(BuildContext ctx) => isSmallScreen(ctx) ? 13 : 15;
+  static double priceSize(BuildContext ctx) => isSmallScreen(ctx) ? 13 : 14;
 }

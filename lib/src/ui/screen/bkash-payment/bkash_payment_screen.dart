@@ -36,7 +36,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               'Bearer $token', // Pass the token in the Authorization header
         },
         body: json.encode({
-          "amount": "100.0", // Example amount
+          "amount": "1.0", // Example amount
           "value_a": "bookstore",
           "value_b": "exampleValueB",
         }),

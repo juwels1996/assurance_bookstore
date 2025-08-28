@@ -32,7 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Obx(() {
           return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Profile image
               Center(
@@ -75,78 +75,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildLabel("Email"),
               _buildTextField(authController.emailname.value),
 
-              // Mobile
-              _buildLabel("Mobile"),
-              _buildTextField(authController.phone.value),
-
-              // Gender
-              _buildLabel("Gender"),
-              Row(
-                children: ["Male", "Female"].map((gender) {
-                  return Row(
-                    children: [
-                      Radio<String>(
-                        value: gender,
-                        groupValue: selectedGender,
-                        activeColor: Colors.red,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedGender = value!;
-                          });
-                        },
-                      ),
-                      Text(gender),
-                      const SizedBox(width: 10),
-                    ],
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 20),
-
-              // Address placeholder
-              _buildLabel("Address"),
-              GestureDetector(
-                onTap: () {
-                  // Navigate to address screen
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    "+ Add New Address",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              // Save button
-              Center(
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: () {
-                      // TODO: Save profile logic
-                    },
-                    child: const Text(
-                      "Save",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ),
-                ),
-              ),
+              // // Mobile
+              // _buildLabel("Mobile"),
+              // _buildTextField(authController.phone.value),
+              //
+              // // Gender
+              // _buildLabel("Gender"),
+              // Row(
+              //   children: ["Male", "Female"].map((gender) {
+              //     return Row(
+              //       children: [
+              //         Radio<String>(
+              //           value: gender,
+              //           groupValue: selectedGender,
+              //           activeColor: Colors.red,
+              //           onChanged: (value) {
+              //             setState(() {
+              //               selectedGender = value!;
+              //             });
+              //           },
+              //         ),
+              //         Text(gender),
+              //         const SizedBox(width: 10),
+              //       ],
+              //     );
+              //   }).toList(),
+              // ),
+              // const SizedBox(height: 20),
+              //
+              // // Address placeholder
+              // _buildLabel("Address"),
+              // GestureDetector(
+              //   onTap: () {
+              //     // Navigate to address screen
+              //   },
+              //   child: Container(
+              //     width: double.infinity,
+              //     padding: const EdgeInsets.symmetric(vertical: 16),
+              //     alignment: Alignment.center,
+              //     decoration: BoxDecoration(
+              //       color: Colors.grey[200],
+              //       borderRadius: BorderRadius.circular(8),
+              //     ),
+              //     child: const Text(
+              //       "+ Add New Address",
+              //       style: TextStyle(fontWeight: FontWeight.bold),
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(height: 30),
+              //
+              // // Save button
+              // Center(
+              //   child: SizedBox(
+              //     width: double.infinity,
+              //     child: ElevatedButton(
+              //       style: ElevatedButton.styleFrom(
+              //         backgroundColor: Colors.red,
+              //         padding: const EdgeInsets.symmetric(vertical: 16),
+              //         shape: RoundedRectangleBorder(
+              //           borderRadius: BorderRadius.circular(8),
+              //         ),
+              //       ),
+              //       onPressed: () {
+              //         // TODO: Save profile logic
+              //       },
+              //       child: const Text(
+              //         "Save",
+              //         style: TextStyle(color: Colors.white, fontSize: 16),
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           );
         }),

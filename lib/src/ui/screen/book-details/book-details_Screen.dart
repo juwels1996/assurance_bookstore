@@ -1,5 +1,8 @@
 import 'package:assurance_bookstore/src/core/helper/extension.dart';
-import 'package:assurance_bookstore/src/ui/widgets/responsive.dart';
+import 'package:assurance_bookstore/src/ui/screen/home/components/book_card.dart'
+    hide Responsive;
+import 'package:assurance_bookstore/src/ui/widgets/responsive.dart'
+    hide Responsive;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
@@ -128,6 +131,15 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 ),
 
                 const SizedBox(height: 8),
+                Text(
+                  book.discountedPrice.toString(),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
 
                 // Author
                 const SizedBox(height: 8),
@@ -286,10 +298,11 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                           ),
                   ],
                 ),
-                SizedBox(height: 4),
+                SizedBox(height: 15),
 
                 // Action Buttons
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Obx(() {
                       int quantity = cartController.getQuantity(book);
