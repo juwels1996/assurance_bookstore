@@ -145,6 +145,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontStyle: FontStyle.italic,
+                                    fontFamily: 'NotoSerif',
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey,
                                   ),
@@ -154,6 +155,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontStyle: FontStyle.italic,
+                                    fontFamily: 'NotoSerif',
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -190,6 +192,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                     category.name,
                     style: context.labelMedium!.copyWith(
                       fontSize: 15,
+                      fontFamily: 'NotoSerif',
                       fontWeight: FontWeight.w500,
                       color: Colors.grey,
                     ),
@@ -202,6 +205,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                     title: Text(
                       sub.name,
                       style: TextStyle(
+                        fontFamily: 'NotoSerif',
                         fontSize: 14,
                         color: Colors.grey.shade700,
                       ),
@@ -263,17 +267,6 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  TextButton(
-                                    onPressed: () {
-                                      // TODO: Navigate to "see all"
-                                    },
-                                    child: Text(
-                                      'সব দেখুন →',
-                                      style: context.labelLarge!.copyWith(
-                                        color: Colors.blueAccent,
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -289,16 +282,41 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                       left: 16.0,
                                       bottom: 2,
                                     ),
-                                    child: Text(
-                                      sub.name,
-                                      style: context.labelLarge!.copyWith(
-                                        color: Colors.redAccent,
-                                        fontSize:
-                                            Responsive.isSmallScreen(context)
-                                            ? 12
-                                            : 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          sub.name,
+                                          style: context.labelLarge!.copyWith(
+                                            color: Colors.redAccent,
+                                            fontSize:
+                                                Responsive.isSmallScreen(
+                                                  context,
+                                                )
+                                                ? 12
+                                                : 14,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Get.to(
+                                              () => SubcategoryScreen(
+                                                subcategoryId: sub.id
+                                                    .toString(),
+                                                subcategoryName: sub.name,
+                                              ),
+                                            );
+                                          },
+                                          child: Text(
+                                            'সব দেখুন →',
+                                            style: context.labelLarge!.copyWith(
+                                              color: Colors.blueAccent,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 SizedBox(height: 5),

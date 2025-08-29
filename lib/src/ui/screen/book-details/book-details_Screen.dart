@@ -124,6 +124,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                   book.title ?? "",
                   style: const TextStyle(
                     fontSize: 20,
+                    // fontFamily: "NotoSans",
                     fontWeight: FontWeight.bold,
                     fontStyle: FontStyle.italic,
                   ),
@@ -132,7 +133,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
                 const SizedBox(height: 8),
                 Text(
-                  book.discountedPrice.toString(),
+                  book.price.toString(),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -175,6 +176,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                   colorClickableText: Colors.pink,
                   trimCollapsedText: '...Show more',
                   style: context.labelMedium!.copyWith(
+                    fontFamily: "NotoSans",
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey,

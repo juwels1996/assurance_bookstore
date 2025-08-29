@@ -123,7 +123,7 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                         title: const Text("Combo Pack (3 Books)"),
                         subtitle: Text(
-                          '৳ ${cartItem.comboBooks!.fold<int>(0, (sum, b) => sum + (b.discountedPrice ?? b.price))}',
+                          '৳ ${cartItem.comboBooks!.fold<int>(0, (sum, b) => sum + (b.price ?? b.price))}',
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -191,7 +191,7 @@ class _CartScreenState extends State<CartScreen> {
                                   Row(
                                     children: [
                                       Text(
-                                        "${cartItem.item.discountedPrice} Tk",
+                                        "${cartItem.item.price} Tk",
                                         style: const TextStyle(
                                           color: Colors.red,
                                           fontWeight: FontWeight.bold,
@@ -283,7 +283,7 @@ class _CartScreenState extends State<CartScreen> {
                           });
                         },
                       ),
-                      const Text("Cash on Delivery (COD)"),
+                      const Text("Home Delivery"),
                     ],
                   ),
                 ],

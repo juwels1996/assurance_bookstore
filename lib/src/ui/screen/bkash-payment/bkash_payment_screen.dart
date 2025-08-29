@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'package:assurance_bookstore/src/core/constants/constants.dart';
+import 'package:assurance_bookstore/src/ui/screen/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:html' as html;
 import 'package:http/http.dart' as http;
 import '../../../core/controllers/auth/auth_controller.dart';
+import '../../../core/controllers/cart-controller/cart_controller.dart';
+import '../../../core/controllers/checkout-controller/checkout_controller.dart';
+import '../delivery-address/order_success_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
   @override
@@ -15,7 +19,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     super.initState();
+
     _createWebPayment();
+
+    html.window.addEventListener("newUrl", (event) {
+      final currentUrl = html.window.location.href;
+
+      print('========>>>>${currentUrl}');
+
+      if (currentUrl.contains("execute-bkash-payment")) {
+        handleCallbackUrl(currentUrl);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    html.window.removeEventListener("newUrl", (event) {});
+    super.dispose();
   }
 
   Future<void> _createWebPayment() async {
@@ -51,10 +72,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
         if (gatewayPageURL != null) {
           // Open the payment URL in the web browser using html.window.open equivalent in Flutter
-          html.window.open(
-            gatewayPageURL,
-            "", // Open the URL in a new tab or window
-          );
+
+          html.window.location.href = gatewayPageURL;
+
+          // html.window.open(
+          //   gatewayPageURL,
+          //   "", // Open the URL in a new tab or window
+          // );
         } else {
           print("Error: 'response_url' is null in the response.");
         }
@@ -73,25 +97,39 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final paymentID = uri.queryParameters['paymentID'];
     final status = uri.queryParameters['status'];
 
-    if (paymentID != null && status != null) {
-      if (status == 'success') {
-        // Handle successful payment
-        Get.snackbar("Payment Successful", "Your payment was successful!");
-        Get.offAllNamed('/success');
-      } else if (status == 'failure') {
-        // Handle payment failure
-        Get.snackbar(
-          "Payment Failed",
-          "Your payment failed. Please try again.",
-        );
-        Get.back();
-      } else if (status == 'cancel') {
-        // Handle cancelled payment
-        Get.snackbar("Payment Cancelled", "Your payment was cancelled.");
-        Get.back();
-      }
+    if (paymentID != null && status == 'success') {
+      Get.snackbar("Payment Successful", "Your payment was successful!");
+
+      // Now place the order and go to OrderSuccessScreen
+      Future.delayed(Duration(milliseconds: 500), () async {
+        final cartItems = Get.find<CartController>().cartItems
+            .map(
+              (e) => {
+                'book_id': (e.item as dynamic).id,
+                'quantity': e.quantity.value,
+              },
+            )
+            .toList();
+
+        final checkoutController = Get.find<CheckoutController>();
+        final order = await checkoutController.submitOrder(cartItems);
+
+        if (order != null) {
+          Get.offAll(
+            () => OrderSuccessScreen(
+              orderId: order['order_id'],
+              orderData: order,
+            ),
+          );
+        }
+      });
+    } else if (status == 'failure') {
+      Get.snackbar("Payment Failed", "Your payment failed.");
+      Get.back();
+    } else if (status == 'cancel') {
+      Get.snackbar("Payment Cancelled", "You cancelled the payment.");
+      Get.back();
     } else {
-      // Handle missing parameters
       Get.snackbar("Error", "Missing payment details.");
     }
   }

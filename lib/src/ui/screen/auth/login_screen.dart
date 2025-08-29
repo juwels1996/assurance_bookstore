@@ -179,9 +179,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Text(
                       isSignup ? "SIGN UP" : "LOGIN",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
+                        fontFamily: 'NotoSerif',
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                         letterSpacing: 1.2,
                       ),
                     ),

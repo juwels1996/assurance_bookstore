@@ -1,8 +1,11 @@
 import 'package:assurance_bookstore/src/ui/screen/cart-screen/cart_screen.dart';
+import 'package:assurance_bookstore/src/ui/screen/contact-us/contact_us.dart';
 import 'package:assurance_bookstore/src/ui/screen/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../widgets/responsive.dart';
+import '../../rules_regulation/privacy_policy.dart';
+import '../../rules_regulation/refund_policy.dart';
 import '../../rules_regulation/terms_condition.dart';
 
 class BottomFooter extends StatelessWidget {
@@ -119,10 +122,25 @@ class BottomFooter extends StatelessWidget {
           },
           child: Text("Terms & Condition"),
         ),
-        Text("Privacy Policy"),
-        Text("Refund & Return Policy"),
+        GestureDetector(
+          onTap: () {
+            Get.to(AssurancePolicyScreen());
+          },
+          child: Text("Privacy Policy"),
+        ),
+        GestureDetector(
+          onTap: () {
+            Get.to(RefundPolicyScreen());
+          },
+          child: Text("Refund & Return Policy"),
+        ),
         Text("About Us"),
-        Text("Contact Us"),
+        GestureDetector(
+          onTap: () {
+            Get.to(ContactUsPage());
+          },
+          child: Text("Contact Us"),
+        ),
       ],
     );
   }

@@ -309,44 +309,46 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
         }).toList();
 
         print("-----------------------------order2");
+        //Payment With Cash On Delivery LOgic here//Dont remove this logic
+        // if (widget.paymentMethod == 'cod') {
+        //   final order = await checkoutController.submitOrder(
+        //     cartItems.cast<Map<String, dynamic>>(),
+        //   );
+        //
+        //   print("---------------${cartItems}");
+        //   if (order != null) {
+        //     Get.snackbar(
+        //       'Order Success',
+        //       'Order #${order['order_id']} submitted successfully',
+        //     );
+        //     Get.offAll(
+        //       () =>
+        //           OrderSuccessScreen(orderId: order['order_id'], orderData: {}),
+        //     );
+        //   }
+        // }
 
-        if (widget.paymentMethod == 'cod') {
+        // else {
+        final result = await Get.to(() => PaymentScreen());
+
+        if (result == true) {
           final order = await checkoutController.submitOrder(
             cartItems.cast<Map<String, dynamic>>(),
           );
-
-          print("---------------${cartItems}");
           if (order != null) {
             Get.snackbar(
               'Order Success',
               'Order #${order['order_id']} submitted successfully',
             );
             Get.offAll(
-              () =>
-                  OrderSuccessScreen(orderId: order['order_id'], orderData: {}),
+              () => OrderSuccessScreen(
+                orderId: order['order_id'],
+                orderData: order,
+              ),
             );
-          }
-        } else {
-          final result = await Get.to(() => PaymentScreen());
-
-          if (result == true) {
-            final order = await checkoutController.submitOrder(
-              cartItems.cast<Map<String, dynamic>>(),
-            );
-            if (order != null) {
-              Get.snackbar(
-                'Order Success',
-                'Order #${order['order_id']} submitted successfully',
-              );
-              Get.offAll(
-                () => OrderSuccessScreen(
-                  orderId: order['order_id'],
-                  orderData: order,
-                ),
-              );
-            }
           }
         }
+        // }
       },
       icon: const Icon(Icons.check_circle_outline, color: Colors.white),
       style: ElevatedButton.styleFrom(

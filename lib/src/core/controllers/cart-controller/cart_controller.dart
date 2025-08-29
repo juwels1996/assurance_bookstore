@@ -118,17 +118,16 @@ class CartController extends GetxController {
       // sum of all books in the combo
       final comboPrice = cartItem.comboBooks!.fold<int>(
         0,
-        (sub, book) => sub + (book.discountedPrice ?? book.price),
+        (sub, book) => sub + (book.price ?? book.discountedPrice),
       );
       return sum + comboPrice * cartItem.quantity.value;
     } else if (cartItem.item is Book) {
       final book = cartItem.item as Book;
-      return sum +
-          (book.discountedPrice ?? book.price) * cartItem.quantity.value;
+      return sum + (book.price ?? book.price) * cartItem.quantity.value;
     } else if (cartItem.item is BookDetail) {
       final book = cartItem.item as BookDetail;
       return sum +
-          (book.discountedPrice ?? book.price)! * cartItem.quantity.value;
+          (book.price ?? book.discountedPrice)! * cartItem.quantity.value;
     }
     return sum;
   });

@@ -106,6 +106,7 @@ class _BookCardState extends State<BookCard> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
+                          fontFamily: "NotoSerif",
                           fontWeight: FontWeight.w600,
                           fontSize: Responsive.titleSize(context),
                         ),
@@ -116,6 +117,7 @@ class _BookCardState extends State<BookCard> {
                           Text(
                             "${b.price.toString()} টাকা",
                             style: TextStyle(
+                              fontFamily: "NotoSans",
                               color: Colors.green.shade700,
                               fontWeight: FontWeight.w700,
                               fontSize: Responsive.priceSize(context),
