@@ -134,36 +134,37 @@ class CartController extends GetxController {
 
   /// Delivery charge (free if any combo)
   int get totalDeliveryCharge {
-    if (cartItems.any((item) => item.isCombo)) return 0;
+    if (totalAmount >= 1500)
+      return 0; // If only combos (no outside books) → free delivery
+    final nonComboItems = cartItems.where((item) => !item.isCombo).toList();
+    if (nonComboItems.isEmpty) return 0;
 
-    int totalCharge = 0;
-    int totalItems = cartItems.fold(
+    // Count total books outside combos
+    int totalBooks = nonComboItems.fold(
       0,
       (sum, item) => sum + item.quantity.value,
     );
 
-    for (var item in cartItems) {
-      final deliveryCharge = item.item is Book
-          ? (item.item as Book).deliveryCharge
-          : (item.item as BookDetail).deliveryCharge;
+    if (totalBooks == 0) return 0;
 
-      if (paymentMethod == 'cod') {
-        if (totalItems == 1) {
-          totalCharge += (deliveryCharge ?? 0) + 40;
-        } else if (totalItems == 2) {
-          totalCharge += (deliveryCharge ?? 0) + 40 + 40;
-        } else if (totalItems > 2) {
-          totalCharge += (deliveryCharge ?? 0) + 40 + (totalItems - 2) * 20;
-        }
-      } else {
-        if (totalItems == 1) {
-          totalCharge += (deliveryCharge ?? 0);
-        } else if (totalItems == 2) {
-          totalCharge += (deliveryCharge ?? 0) + 40;
-        } else if (totalItems > 2) {
-          totalCharge += (deliveryCharge ?? 0) + (totalItems - 2) * 20;
-        }
-      }
+    // Get initial delivery charge from the first book only
+    final firstItem = nonComboItems.first.item;
+    final firstCharge = firstItem is Book
+        ? (firstItem.deliveryCharge ?? 0)
+        : (firstItem as BookDetail).deliveryCharge ?? 0;
+
+    int totalCharge = firstCharge;
+
+    if (totalBooks >= 2) {
+      totalCharge += 40; // second book charge
+    }
+    if (totalBooks > 2) {
+      totalCharge += (totalBooks - 2) * 20; // from 3rd onwards
+    }
+
+    // If payment method is COD, add COD surcharge (+40 flat)
+    if (paymentMethod == 'cod') {
+      totalCharge += 40;
     }
 
     return totalCharge;

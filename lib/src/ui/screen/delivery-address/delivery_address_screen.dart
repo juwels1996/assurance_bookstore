@@ -357,7 +357,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       label: const Text(
-        "Order Place-------",
+        "Order Place",
         style: TextStyle(fontSize: 16, color: Colors.white),
       ),
     );

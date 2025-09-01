@@ -1,6 +1,8 @@
 import 'package:assurance_bookstore/src/ui/screen/cart-screen/cart_screen.dart';
 import 'package:assurance_bookstore/src/ui/screen/contact-us/contact_us.dart';
 import 'package:assurance_bookstore/src/ui/screen/home/home_page.dart';
+import 'package:assurance_bookstore/src/ui/screen/rules_regulation/about_us.dart';
+import 'package:assurance_bookstore/src/ui/screen/rules_regulation/book_order.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../widgets/responsive.dart';
@@ -114,34 +116,63 @@ class BottomFooter extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("HELP", style: TextStyle(fontWeight: FontWeight.bold)),
-        SizedBox(height: 8),
-        GestureDetector(
-          onTap: () {
-            Get.to(TermsAndConditionsScreen());
-          },
-          child: Text("Terms & Condition"),
+        const Text(
+          "HELP",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
-        GestureDetector(
-          onTap: () {
-            Get.to(AssurancePolicyScreen());
-          },
-          child: Text("Privacy Policy"),
+        const SizedBox(height: 8),
+        _buildLinkItem(
+          Icons.article,
+          "Terms & Condition",
+          () => Get.to(() => const TermsAndConditionsScreen()),
         ),
-        GestureDetector(
-          onTap: () {
-            Get.to(RefundPolicyScreen());
-          },
-          child: Text("Refund & Return Policy"),
+
+        _buildLinkItem(
+          Icons.money,
+          "Book Order",
+          () => Get.to(() => BookOrderPolicy()),
         ),
-        Text("About Us"),
-        GestureDetector(
-          onTap: () {
-            Get.to(ContactUsPage());
-          },
-          child: Text("Contact Us"),
+
+        _buildLinkItem(
+          Icons.money,
+          "About Us",
+          () => Get.to(() => AboutUsScreen()),
+        ),
+
+        _buildLinkItem(
+          Icons.privacy_tip,
+          "Privacy Policy",
+          () => Get.to(() => const AssurancePolicyScreen()),
+        ),
+        _buildLinkItem(
+          Icons.assignment_return,
+          "Refund & Return Policy",
+          () => Get.to(() => const RefundPolicyScreen()),
+        ),
+
+        _buildLinkItem(
+          Icons.contact_mail,
+          "Contact Us",
+          () => Get.to(() => ContactUsPage()),
         ),
       ],
+    );
+  }
+
+  /// 🔗 Reusable Link Item with Icon
+  Widget _buildLinkItem(IconData icon, String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          children: [
+            Icon(icon, size: 18),
+            const SizedBox(width: 8),
+            Text(label),
+          ],
+        ),
+      ),
     );
   }
 }

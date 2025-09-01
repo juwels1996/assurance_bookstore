@@ -21,14 +21,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
     super.initState();
 
     _createWebPayment();
+    _checkPaymentResult();
 
-    html.window.addEventListener("newUrl", (event) {
-      final currentUrl = html.window.location.href;
+    html.window.addEventListener("type", (event) {
+      print('==>>>>==${html.window.location.href}');
+    });
 
-      print('========>>>>${currentUrl}');
+    html.window.onPopState.listen((event) => _checkPaymentResult());
 
-      if (currentUrl.contains("execute-bkash-payment")) {
-        handleCallbackUrl(currentUrl);
+    html.window.onPopState.listen((event) {
+      print('==<<<<<<<==${html.window.location.href}');
+      final uri = Uri.base;
+      if (uri.toString().contains("payment-success")) {
+        handleCallbackUrl(uri.toString());
       }
     });
   }
@@ -73,7 +78,32 @@ class _PaymentScreenState extends State<PaymentScreen> {
         if (gatewayPageURL != null) {
           // Open the payment URL in the web browser using html.window.open equivalent in Flutter
 
-          html.window.location.href = gatewayPageURL;
+          html.window.open(gatewayPageURL, "_blank");
+          // html.window.location.href = gatewayPageURL;
+          Future.delayed(Duration(milliseconds: 500), () async {
+            final cartItems = Get.find<CartController>().cartItems
+                .map(
+                  (e) => {
+                    'book_id': (e.item as dynamic).id,
+                    'quantity': e.quantity.value,
+                  },
+                )
+                .toList();
+
+            final checkoutController = Get.find<CheckoutController>();
+            final order = await checkoutController.submitOrder(cartItems);
+
+            if (order != null) {
+              Get.offAll(
+                () => OrderSuccessScreen(
+                  orderId: order['order_id'],
+                  orderData: order,
+                ),
+              );
+            }
+          });
+
+          // html.window.location.href = gatewayPageURL;
 
           // html.window.open(
           //   gatewayPageURL,
@@ -131,6 +161,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
       Get.back();
     } else {
       Get.snackbar("Error", "Missing payment details.");
+    }
+  }
+
+  void _checkPaymentResult() {
+    final uri = Uri.base;
+    final status = uri.queryParameters['status'];
+    final trxId = uri.queryParameters['trxID'];
+
+    if (uri.toString().contains("payment-success") && status == "Completed") {
+      Get.offAll(
+        () => OrderSuccessScreen(orderId: 0, orderData: {'trxID': trxId}),
+      );
+    } else if (status == "Failed") {
+      Get.snackbar("Payment Failed", "Please try again.");
+      Get.back();
+    } else if (status == "Cancelled") {
+      Get.snackbar("Payment Cancelled", "You cancelled the payment.");
+      Get.back();
     }
   }
 

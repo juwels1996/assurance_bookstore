@@ -101,7 +101,7 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       child: ListTile(
                         leading: SizedBox(
-                          width: 80,
+                          width: 90,
                           child: Row(
                             children: cartItem.comboBooks!
                                 .take(3) // show 3 book covers
@@ -111,7 +111,7 @@ class _CartScreenState extends State<CartScreen> {
                                     child: Image.network(
                                       book.image ?? "",
                                       width: 25,
-                                      height: 40,
+                                      height: 70,
                                       fit: BoxFit.cover,
                                       errorBuilder: (_, __, ___) =>
                                           const Icon(Icons.book),

@@ -56,24 +56,111 @@ class _SubcategoryScreenState extends State<SubcategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.subcategoryName)),
+      appBar: AppBar(
+        title: Text(widget.subcategoryName),
+        centerTitle: true,
+        backgroundColor: Colors.deepPurple,
+      ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : books.isEmpty
-          ? Center(child: Text('No books available'))
-          : SizedBox(
-              height: Responsive.isSmallScreen(context) ? 200 : 292,
-              child: ListView.builder(
-                padding: const EdgeInsets.all(0.0),
-                scrollDirection: Axis.horizontal,
-                itemCount: books.length,
-                itemBuilder: (context, index) {
-                  return BookCard(book: books[index]);
-                },
+          ? const Center(child: Text('No books available'))
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 🔹 Category Info Header
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.subcategoryName,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          "${books.length} books available",
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // 🔹 Sort & Filter Bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Books",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        PopupMenuButton<String>(
+                          onSelected: (value) {
+                            // TODO: sort logic
+                          },
+                          itemBuilder: (context) => [
+                            const PopupMenuItem(
+                              value: "latest",
+                              child: Text("Latest"),
+                            ),
+                            const PopupMenuItem(
+                              value: "low_to_high",
+                              child: Text("Price: Low to High"),
+                            ),
+                            const PopupMenuItem(
+                              value: "high_to_low",
+                              child: Text("Price: High to Low"),
+                            ),
+                          ],
+                          child: const Icon(Icons.sort),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // 🔹 Books Grid/List
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: Responsive.isSmallScreen(context)
+                            ? 2
+                            : 4,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        childAspectRatio: 0.65,
+                      ),
+                      itemCount: books.length,
+                      itemBuilder: (context, index) {
+                        return BookCard(book: books[index]);
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
     );
   }
 }
-
-// Book Model

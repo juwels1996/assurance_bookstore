@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/constants.dart';
 import '../../../../core/controllers/cart-controller/cart_controller.dart';
-import '../../../widgets/responsive.dart';
 import '../../book-details/book-details_Screen.dart';
 
 class BookCard extends StatefulWidget {

@@ -1,8 +1,4 @@
 import 'package:assurance_bookstore/src/core/helper/extension.dart';
-import 'package:assurance_bookstore/src/ui/screen/home/components/book_card.dart'
-    hide Responsive;
-import 'package:assurance_bookstore/src/ui/widgets/responsive.dart'
-    hide Responsive;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
@@ -29,9 +25,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
   void updateBookDetails(String bookId) {
     setState(() {
-      controller.fetchBookDetailsData(
-        bookId,
-      ); // Fetch new book data based on selected related book
+      controller.fetchBookDetailsData(bookId);
     });
   }
 
@@ -44,31 +38,31 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey.shade100,
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: Colors.blueGrey.shade100,
-        title: Text('বইয়ের বিস্তারিত'),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text(
+          '📚 বইয়ের বিস্তারিত',
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
+        ),
+        iconTheme: const IconThemeData(color: Colors.black87),
         actions: [
           Obx(() {
             return Stack(
               alignment: Alignment.topRight,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.shopping_cart),
-                  onPressed: () {
-                    Get.to(() => CartScreen()); // Navigate to cart screen
-                  },
+                  icon: const Icon(Icons.shopping_cart_outlined),
+                  onPressed: () => Get.to(() => CartScreen()),
                 ),
                 if (cartController.totalItems > 0)
                   Positioned(
                     right: 6,
                     top: 6,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
+                    child: CircleAvatar(
+                      radius: 9,
+                      backgroundColor: Colors.red,
                       child: Obx(
                         () => Text(
                           '${cartController.totalItems}',
@@ -97,362 +91,381 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
         final BookDetail book = controller.bookDetails.value!;
 
-        return Padding(
-          padding: EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: Responsive.isSmallScreen(context)
-                  ? CrossAxisAlignment.start
-                  : CrossAxisAlignment.center,
-              children: [
-                // Book Image
-                Center(
-                  child: ClipRRect(
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // 🔹 Book Cover + Info
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Book Cover
+                  ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
                       Constants.imageUrl + book.image.toString(),
-                      height: Responsive.isSmallScreen(context) ? 150 : 200,
+                      height: 200,
+                      width: 150,
                       fit: BoxFit.cover,
                     ),
                   ),
-                ),
+                  const SizedBox(width: 16),
 
-                const SizedBox(height: 16),
-
-                // Title
-                Text(
-                  book.title ?? "",
-                  style: const TextStyle(
-                    fontSize: 20,
-                    // fontFamily: "NotoSans",
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic,
+                  // Book Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          book.title ?? "",
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          "by ${book.editor ?? "Unknown"}",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          "৳ ${book.price}",
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.star, color: Colors.amber, size: 18),
+                            const SizedBox(width: 4),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  textAlign: TextAlign.center,
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // 🔹 Book Specs
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-
-                const SizedBox(height: 8),
-                Text(
-                  book.price.toString(),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                // Author
-                const SizedBox(height: 8),
-
-                // Price
-                RichText(
-                  text: TextSpan(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
                     children: [
-                      TextSpan(
-                        text: 'প্রকাশনী :',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ' Assurance Publicatios ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blue,
-                          fontSize: 16,
-                        ),
-                      ),
+                      buildSpecRow("প্রকাশনী", "Assurance Publications"),
+                      buildSpecRow("পৃষ্ঠা সংখ্যা", "${book.pages ?? "N/A"}"),
+                      buildSpecRow("সংস্করণ", "${book.edition ?? "N/A"}"),
+                      buildSpecRow("ভাষা", book.language ?? "বাংলা"),
                     ],
                   ),
                 ),
+              ),
 
-                // Description
-                ReadMoreText(
-                  book.description ?? 'কোনো বিবরণ নেই।',
-                  trimMode: TrimMode.Line,
-                  trimLines: 3,
-                  colorClickableText: Colors.pink,
-                  trimCollapsedText: '...Show more',
-                  style: context.labelMedium!.copyWith(
-                    fontFamily: "NotoSans",
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey,
-                  ),
-                  trimExpandedText: '...Show less',
-                  moreStyle: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blue,
+              const SizedBox(height: 20),
+
+              // 🔹 Description
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "বিবরণ",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurple,
                   ),
                 ),
+              ),
+              const SizedBox(height: 8),
+              ReadMoreText(
+                book.description ?? 'কোনো বিবরণ নেই।',
+                trimMode: TrimMode.Line,
+                trimLines: 4,
+                colorClickableText: Colors.deepPurple,
+                trimCollapsedText: 'আরও পড়ুন',
+                trimExpandedText: 'কম দেখান',
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
+              ),
 
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: Responsive.isSmallScreen(context)
-                      ? MainAxisAlignment.start
-                      : MainAxisAlignment.center,
-                  crossAxisAlignment: Responsive.isSmallScreen(context)
-                      ? CrossAxisAlignment.start
-                      : CrossAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          cartController.addToCart(book);
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey, // Button background
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            // Icon container with its own border and background
-                            Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: Colors.redAccent,
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Icon(
-                                Icons.add_shopping_cart,
-                                color: Colors.deepPurple,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Add to Cart',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
+              const SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: Responsive.isSmallScreen(context)
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.center,
+                crossAxisAlignment: Responsive.isSmallScreen(context)
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        cartController.addToCart(book);
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 2,
                       ),
-                    ),
-
-                    SizedBox(width: 15),
-                    book.previewPdfUrl!.isNotEmpty
-                        ? GestureDetector(
-                            onTap: () {
-                              html.window.open(
-                                Constants.imageUrl +
-                                    book.previewPdfUrl.toString(),
-                                '_blank',
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.red.shade700,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              alignment: Alignment.center,
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      'একটু পড়ে দেখুন',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                        : Container(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.blueGrey, // Button background
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          // Icon container with its own border and background
+                          Container(
+                            padding: const EdgeInsets.all(2),
                             decoration: BoxDecoration(
-                              color: Colors.yellow,
+                              color: Colors.white,
+                              border: Border.all(
+                                color: Colors.redAccent,
+                                width: 2,
+                              ),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            alignment: Alignment.center,
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'No Pdf Available',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
+                            child: const Icon(
+                              Icons.add_shopping_cart,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Add to Cart',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(width: 15),
+                  book.previewPdfUrl != null && book.previewPdfUrl!.isNotEmpty
+                      ? OutlinedButton.icon(
+                          onPressed: () => html.window.open(
+                            Constants.imageUrl + book.previewPdfUrl.toString(),
+                            '_blank',
+                          ),
+                          icon: const Icon(
+                            Icons.picture_as_pdf,
+                            color: Colors.red,
+                          ),
+                          label: const Text("একটু পড়ে দেখুন"),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.red),
+                          ),
+                        )
+                      : Container(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.yellow,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'No Pdf Available',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+              SizedBox(height: 15),
+
+              // Action Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Obx(() {
+                    int quantity = cartController.getQuantity(book);
+
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: const Color(
+                          0xFFF5F6FA,
+                        ), // light background like screenshot
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Decrement Button
+                          GestureDetector(
+                            onTap: () => cartController.removeFromCart(book),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: const BoxDecoration(
+                                color: Colors.red, // Light gray
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(4),
+                                  bottomLeft: Radius.circular(4),
+                                ),
+                              ),
+                              child: const Icon(Icons.remove, size: 18),
+                            ),
+                          ),
+
+                          // Quantity Text
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            color: Colors.white,
+                            child: Text(
+                              '$quantity',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
-                  ],
-                ),
-                SizedBox(height: 15),
 
-                // Action Buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Obx(() {
-                      int quantity = cartController.getQuantity(book);
-
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: const Color(
-                            0xFFF5F6FA,
-                          ), // light background like screenshot
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Decrement Button
-                            GestureDetector(
-                              onTap: () => cartController.removeFromCart(book),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                decoration: const BoxDecoration(
-                                  color: Colors.red, // Light gray
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(4),
-                                    bottomLeft: Radius.circular(4),
-                                  ),
-                                ),
-                                child: const Icon(Icons.remove, size: 18),
-                              ),
-                            ),
-
-                            // Quantity Text
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
+                          // Increment Button
+                          GestureDetector(
+                            onTap: () => cartController.addToCart(book),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
                                 vertical: 8,
                               ),
+                              decoration: const BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(4),
+                                  bottomRight: Radius.circular(4),
+                                ),
+                              ),
+                              child: const Icon(Icons.add, size: 18),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                  SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        // Add the book to cart
+                        cartController.addToCart(book);
+                      });
+
+                      // Navigate to Cart/Checkout screen
+                      Get.to(() => CartScreen());
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade400, // Buy Now button color
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Icon container with its own border and background
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Buy Now',
+                            style: TextStyle(
                               color: Colors.white,
-                              child: Text(
-                                '$quantity',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                              fontWeight: FontWeight.bold,
                             ),
-
-                            // Increment Button
-                            GestureDetector(
-                              onTap: () => cartController.addToCart(book),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                decoration: const BoxDecoration(
-                                  color: Colors.green,
-                                  borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(4),
-                                    bottomRight: Radius.circular(4),
-                                  ),
-                                ),
-                                child: const Icon(Icons.add, size: 18),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-                    SizedBox(width: 12),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          // Add the book to cart
-                          cartController.addToCart(book);
-                        });
-
-                        // Navigate to Cart/Checkout screen
-                        Get.to(() => CartScreen());
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade400, // Buy Now button color
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Icon container with its own border and background
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Buy Now',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
 
-                SizedBox(height: 50),
-
-                Text(
-                  "Related Books",
-                  style: context.labelMedium!.copyWith(
-                    fontSize: 22,
-                    color: Colors.red,
+              // 🔹 Related Books
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "সম্পর্কিত বই",
+                  style: TextStyle(
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: Colors.red.shade700,
                   ),
                 ),
-                Divider(),
-
-                SizedBox(
-                  height: Responsive.isSmallScreen(context) ? 190 : 292,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: book.relatedBooks?.length,
-                    itemBuilder: (context, bookIndex) {
-                      return GestureDetector(
-                        onTap: () {
-                          // Update the book details when a related book is tapped
-                          updateBookDetails(
-                            book.relatedBooks![bookIndex].id.toString(),
-                          );
-                        },
-                        child: BookDetailsCard(
-                          book: book.relatedBooks![bookIndex],
-                        ),
-                      );
-                    },
-                  ),
+              ),
+              const Divider(),
+              SizedBox(
+                height: 260,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: book.relatedBooks?.length ?? 0,
+                  itemBuilder: (context, bookIndex) {
+                    return GestureDetector(
+                      onTap: () => updateBookDetails(
+                        book.relatedBooks![bookIndex].id.toString(),
+                      ),
+                      child: BookDetailsCard(
+                        book: book.relatedBooks![bookIndex],
+                      ),
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       }),
+    );
+  }
+
+  Widget buildSpecRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(value, style: const TextStyle(color: Colors.black54)),
+          ),
+        ],
+      ),
     );
   }
 }
