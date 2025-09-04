@@ -10,6 +10,7 @@ class BookDetail {
   int? pages;
   String? country;
   String? language;
+  int? initialPrice;
   int? price;
   int? discountedPrice;
   int? discountPercent;
@@ -32,6 +33,7 @@ class BookDetail {
     this.country,
     this.language,
     this.price,
+    this.initialPrice,
     this.discountedPrice,
     this.discountPercent,
     this.deliveryCharge,
@@ -57,6 +59,9 @@ class BookDetail {
     language: json['language'] ?? "",
     price: json['price'] is int
         ? json['price']
+        : int.tryParse(json['price']?.toString() ?? "0"),
+    initialPrice: json['initial_price'] is int
+        ? json['initial_price']
         : int.tryParse(json['price']?.toString() ?? "0"),
     discountedPrice: json['discounted_price'] is int
         ? json['discounted_price']

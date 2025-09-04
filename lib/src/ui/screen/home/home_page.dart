@@ -3,6 +3,7 @@ import 'package:assurance_bookstore/src/ui/screen/home/subbcategory-widget/subca
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/controllers/auth/auth_controller.dart';
 import '../../../core/controllers/home/home_controller.dart';
 import '../../../core/models/home/home_page_data.dart';
@@ -106,94 +107,94 @@ class _HomePageState extends State<HomePage> {
 }
 
 /// Redesigned Category + Subcategory + Banner Section
+/// Redesigned Category + Subcategory + Banner Section
 Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
+  final isSmall = Responsive.isSmallScreen(context);
+
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      // 📂 Left Sidebar
-      Container(
-        height: Get.height * 0.9,
-        width: Responsive.isSmallScreen(context)
-            ? MediaQuery.of(context).size.width * 0.35
-            : MediaQuery.of(context).size.width * 0.18,
-        color: Colors.grey.shade100,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            // 👤 User Welcome
-            Obx(() {
-              if (authController.isLoggedIn) {
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.blue.shade100,
-                    child: Icon(Icons.person, color: Colors.blue),
-                  ),
-                  title: Text(
-                    "Welcome",
-                    style: TextStyle(fontSize: 13, color: Colors.grey),
-                  ),
-                  subtitle: Text(
-                    authController.username.value,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                );
-              } else {
-                return const SizedBox.shrink();
-              }
-            }),
+      // 📂 Left Sidebar (only visible on large screen)
+      if (!isSmall)
+        Container(
+          height: Get.height * 0.9,
+          width: MediaQuery.of(context).size.width * 0.18,
+          color: Colors.grey.shade100,
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              // 👤 User Welcome
+              Obx(() {
+                if (authController.isLoggedIn) {
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue.shade100,
+                      child: Icon(Icons.person, color: Colors.blue),
+                    ),
+                    title: Text(
+                      "Welcome",
+                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                    ),
+                    subtitle: Text(
+                      authController.username.value,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              }),
 
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                'বিষয়',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'বিষয়',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
                 ),
               ),
-            ),
 
-            // 📌 Categories with colorful icons
-            ...homeController.homePageData.map((category) {
-              return ExpansionTile(
-                leading: Icon(
-                  Icons.bookmark,
-                  color:
-                      Colors.primaries[category.id %
-                          Colors.primaries.length], // colorful
-                ),
-                title: Text(
-                  category.name,
-                  style: context.labelMedium!.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+              // Category Expansion list for large screen
+              ...homeController.homePageData.map((category) {
+                return ExpansionTile(
+                  leading: Icon(
+                    Icons.bookmark,
+                    color:
+                        Colors.primaries[category.id % Colors.primaries.length],
                   ),
-                ),
-                children: category.subcategories.map((sub) {
-                  return ListTile(
-                    leading: Icon(
-                      Icons.arrow_right_alt,
-                      color:
-                          Colors.primaries[sub.id %
-                              Colors.primaries.length], // colorful
+                  title: Text(
+                    category.name,
+                    style: context.labelMedium!.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
-                    title: Text(sub.name),
-                    onTap: () {
-                      Get.to(
-                        () => SubcategoryScreen(
-                          subcategoryId: sub.id.toString(),
-                          subcategoryName: sub.name,
-                        ),
-                      );
-                    },
-                  );
-                }).toList(),
-              );
-            }).toList(),
-          ],
+                  ),
+                  children: category.subcategories.map((sub) {
+                    return ListTile(
+                      leading: Icon(
+                        Icons.arrow_right_alt,
+                        color:
+                            Colors.primaries[sub.id % Colors.primaries.length],
+                      ),
+                      title: Text(sub.name),
+                      onTap: () {
+                        Get.to(
+                          () => SubcategoryScreen(
+                            subcategoryId: sub.id.toString(),
+                            subcategoryName: sub.name,
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
+                );
+              }).toList(),
+            ],
+          ),
         ),
-      ),
 
       // 📚 Right Content
       Expanded(
@@ -201,9 +202,109 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
           shrinkWrap: true,
           itemCount: categories.length + 2,
           itemBuilder: (context, categoryIndex) {
+            final List<IconData> bookIcons = [
+              Icons.menu_book,
+              Icons.book_online,
+              Icons.library_books,
+              Icons.auto_stories,
+              Icons.import_contacts,
+              Icons.menu_book_outlined,
+              Icons.collections_bookmark,
+              Icons.chrome_reader_mode,
+            ];
+
             if (categoryIndex == 0) {
               // 🖼️ Banner first
-              return AutoScrollBanners(banners: homeController.banners);
+              return Column(
+                children: [
+                  AutoScrollBanners(banners: homeController.banners),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          // Example: launch phone dialer
+                          launchUrl(Uri.parse("tel:01313770770"));
+                        },
+                        child: Image.asset(
+                          'assets/images/call.png',
+                          height: 100.h,
+                        ),
+                      ),
+
+                      SizedBox(width: 15.w),
+
+                      // Live Chat
+                      GestureDetector(
+                        onTap: () {
+                          // Example: open Messenger link
+                          launchUrl(Uri.parse("https://m.me/yourpageid"));
+                        },
+                        child: Image.asset(
+                          'assets/images/chat.png',
+                          height: 100.h,
+                        ),
+                      ),
+
+                      // ✅ New Image (Your feature)
+                    ],
+                  ),
+                  // 👇 Show category buttons *after* banner on small screens
+                  if (isSmall)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 5,
+                        runSpacing: 5,
+                        children: List.generate(categories.length, (index) {
+                          final category = categories[index];
+                          final icon =
+                              bookIcons[index %
+                                  bookIcons.length]; // pick icon by index
+
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ElevatedButton(
+                                style: ButtonStyle(),
+
+                                onPressed: () {
+                                  Get.to(
+                                    () => SubcategoryScreen(
+                                      subcategoryId: category.id.toString(),
+                                      subcategoryName: category.name,
+                                    ),
+                                  );
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.bookmark,
+                                      color: Colors.redAccent,
+                                    ),
+                                    SizedBox(
+                                      width: 120,
+                                      child: Text(
+                                        category.name,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                      ),
+                    ),
+                ],
+              );
             } else if (categoryIndex == categories.length + 1) {
               return BottomFooter();
             } else {
@@ -228,9 +329,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                             Text(
                               category.name,
                               style: context.labelLarge!.copyWith(
-                                fontSize: Responsive.isSmallScreen(context)
-                                    ? 14
-                                    : 18,
+                                fontSize: isSmall ? 14 : 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -239,7 +338,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                       ),
                     const Divider(),
 
-                    // 🎨 Subcategories shown immediately after banner
+                    // 🎨 Subcategories
                     ...category.subcategories.map((sub) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,9 +379,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                             ),
                           const SizedBox(height: 5),
                           SizedBox(
-                            height: Responsive.isSmallScreen(context)
-                                ? 190
-                                : 250,
+                            height: isSmall ? 190 : 250,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount: sub.books.length,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/controllers/auth/auth_controller.dart';
 import '../../core/controllers/cart-controller/cart_controller.dart';
+import '../screen/book-details/components/related_book_widget.dart';
 import '../screen/cart-screen/cart_screen.dart';
 import '../screen/contact-us/contact_us.dart';
 import '../screen/profile/user_profile_screen.dart';
@@ -66,9 +67,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                     onTap: () => Get.to(() => ProfileScreen()),
                                     child: Text(
                                       "Hello, ${authController.username.value.isNotEmpty ? authController.username.value : 'User'}",
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
+                                        fontSize: 16,
                                       ),
                                     ),
                                   ),
@@ -124,10 +126,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                             ),
                         ],
                       ),
-                      TextButton(
-                        onPressed: () => Get.to(() => ContactUsPage()),
-                        child: const Text("Contact Us"),
-                      ),
+                      Responsive.isSmallScreen(context)
+                          ? SizedBox()
+                          : TextButton(
+                              onPressed: () => Get.to(() => ContactUsPage()),
+                              child: const Text("Contact Us"),
+                            ),
                     ],
                   );
                 }),

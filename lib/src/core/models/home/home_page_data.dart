@@ -62,6 +62,7 @@ class Book {
   String? publisher;
   String? editor;
   int price;
+  int initialPrice;
   int discountedPrice;
   int deliveryCharge;
   int pages;
@@ -83,6 +84,7 @@ class Book {
     required this.publisher,
     required this.editor,
     required this.price,
+    required this.initialPrice,
     required this.discountedPrice,
     required this.deliveryCharge,
     required this.pages,
@@ -105,6 +107,7 @@ class Book {
     publisher: json["publisher"],
     editor: json["editor"],
     price: json["price"],
+    initialPrice: json["initial_price"],
     discountedPrice: json["discounted_price"],
     deliveryCharge: json["delivery_charge"],
     pages: json["pages"],

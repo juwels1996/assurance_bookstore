@@ -55,6 +55,33 @@ class OrderSuccessScreen extends StatelessWidget {
     }
   }
 
+  Future<void> viewInvoice(int orderId) async {
+    try {
+      final token = Get.find<AuthController>().token.value;
+
+      final response = await DioConfig().dio.get(
+        'order-invoice/$orderId/',
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+          responseType: ResponseType.plain, // ✅ Expect HTML text
+        ),
+      );
+
+      if (kIsWeb) {
+        // Create a Blob with HTML string
+        final blob = html.Blob([response.data], 'text/html');
+        final url = html.Url.createObjectUrlFromBlob(blob);
+
+        html.window.open(url, "_blank");
+
+        html.Url.revokeObjectUrl(url);
+      } else {}
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to open invoice');
+      print("❌ Invoice open error: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,7 +135,7 @@ class OrderSuccessScreen extends StatelessWidget {
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () async {
-                  await downloadInvoice(orderId);
+                  await viewInvoice(orderId);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey,

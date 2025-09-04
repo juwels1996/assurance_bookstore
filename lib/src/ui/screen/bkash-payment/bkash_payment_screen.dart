@@ -164,15 +164,30 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  void _checkPaymentResult() {
+  void _checkPaymentResult() async {
     final uri = Uri.base;
     final status = uri.queryParameters['status'];
     final trxId = uri.queryParameters['trxID'];
 
     if (uri.toString().contains("payment-success") && status == "Completed") {
-      Get.offAll(
-        () => OrderSuccessScreen(orderId: 0, orderData: {'trxID': trxId}),
-      );
+      final cartItems = Get.find<CartController>().cartItems
+          .map(
+            (e) => {
+              'book_id': (e.item as dynamic).id,
+              'quantity': e.quantity.value,
+            },
+          )
+          .toList();
+
+      final checkoutController = Get.find<CheckoutController>();
+      final order = await checkoutController.submitOrder(cartItems);
+
+      if (order != null) {
+        Get.offAll(
+          () =>
+              OrderSuccessScreen(orderId: order['order_id'], orderData: order),
+        );
+      }
     } else if (status == "Failed") {
       Get.snackbar("Payment Failed", "Please try again.");
       Get.back();

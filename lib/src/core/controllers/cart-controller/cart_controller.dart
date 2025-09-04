@@ -24,11 +24,9 @@ class CartController extends GetxController {
   var cartItems = <CartItem<dynamic>>[].obs;
   String paymentMethod = 'bkash';
 
-  /// Total items in cart
   int get totalItems =>
       cartItems.fold(0, (sum, cartItem) => sum + cartItem.quantity.value);
 
-  /// Add single book
   void addToCart(dynamic newItem) {
     final index = cartItems.indexWhere((cartItem) {
       if (cartItem.isCombo) return false; // skip combos
@@ -126,8 +124,7 @@ class CartController extends GetxController {
       return sum + (book.price ?? book.price) * cartItem.quantity.value;
     } else if (cartItem.item is BookDetail) {
       final book = cartItem.item as BookDetail;
-      return sum +
-          (book.price ?? book.discountedPrice)! * cartItem.quantity.value;
+      return sum + (book.price ?? book.price)! * cartItem.quantity.value;
     }
     return sum;
   });
@@ -147,7 +144,6 @@ class CartController extends GetxController {
 
     if (totalBooks == 0) return 0;
 
-    // Get initial delivery charge from the first book only
     final firstItem = nonComboItems.first.item;
     final firstCharge = firstItem is Book
         ? (firstItem.deliveryCharge ?? 0)

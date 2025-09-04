@@ -123,10 +123,10 @@ class _BookCardState extends State<BookCard> {
                             ),
                           ),
                           const SizedBox(width: 6),
-                          b.discountedPrice == 0
+                          b.initialPrice == 0
                               ? SizedBox()
                               : Text(
-                                  b.discountedPrice.toString(),
+                                  b.initialPrice.toString(),
                                   style: TextStyle(
                                     decoration: TextDecoration.lineThrough,
                                     color: Colors.grey.shade500,
@@ -157,7 +157,7 @@ class _BookCardState extends State<BookCard> {
                           child: Container(
                             alignment: Alignment.center,
                             decoration: const BoxDecoration(
-                              color: Colors.black87,
+                              color: Colors.redAccent,
                               borderRadius: BorderRadius.only(
                                 bottomLeft: Radius.circular(14),
                                 bottomRight: Radius.circular(14),
