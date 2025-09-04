@@ -214,7 +214,6 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
             ];
 
             if (categoryIndex == 0) {
-              // 🖼️ Banner first
               return Column(
                 children: [
                   AutoScrollBanners(banners: homeController.banners),
