@@ -373,17 +373,14 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ),
 
-            // Order Summary
-            // ✅ ORDER SUMMARY (fixed reactive + combo logic)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Obx(() {
                 final hasCombo = cartController.cartItems.any(
                   (item) => item.isCombo,
                 );
-                final deliveryCharge = hasCombo
-                    ? 0
-                    : cartController.totalDeliveryCharge;
+                final deliveryCharge =
+                    hasCombo ? 0 : cartController.totalDeliveryCharge;
                 final totalPayable =
                     cartController.totalAmount + deliveryCharge;
 
@@ -419,9 +416,8 @@ class _CartScreenState extends State<CartScreen> {
                           hasCombo ? "Free" : "$deliveryCharge Tk",
                           style: TextStyle(
                             color: hasCombo ? Colors.green : Colors.black,
-                            fontWeight: hasCombo
-                                ? FontWeight.bold
-                                : FontWeight.normal,
+                            fontWeight:
+                                hasCombo ? FontWeight.bold : FontWeight.normal,
                           ),
                         ),
                       ],
