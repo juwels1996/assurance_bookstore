@@ -1,0 +1,86 @@
+import 'package:assurance_bookstore/src/core/models/home/home_page_data.dart';
+
+class BookDetail {
+  int id;
+  String? title;
+  String? image;
+  String? editor;
+  String? publisher;
+  String? edition;
+  int? pages;
+  String? country;
+  String? language;
+  int? initialPrice;
+  int? price;
+  int? discountedPrice;
+  int? discountPercent;
+  int? deliveryCharge;
+  bool? isAvailable;
+  int? quantityAvailable;
+  String? previewPdfUrl;
+  String? description;
+  List<String>? features;
+  List<Book>? relatedBooks;
+
+  BookDetail({
+    required this.id,
+    this.title,
+    this.image,
+    this.editor,
+    this.publisher,
+    this.edition,
+    this.pages,
+    this.country,
+    this.language,
+    this.price,
+    this.initialPrice,
+    this.discountedPrice,
+    this.discountPercent,
+    this.deliveryCharge,
+    this.isAvailable,
+    this.quantityAvailable,
+    this.previewPdfUrl,
+    this.description,
+    this.features,
+    this.relatedBooks,
+  });
+
+  factory BookDetail.fromJson(Map<String, dynamic> json) => BookDetail(
+    id: json['id'] ?? 0,
+    title: json['title'] ?? "",
+    image: json['image'] ?? "",
+    editor: json['editor'] ?? "",
+    publisher: json['publisher'] ?? "",
+    edition: json['edition'] ?? "",
+    pages: json['pages'] is int
+        ? json['pages']
+        : int.tryParse(json['pages']?.toString() ?? "0"),
+    country: json['country'] ?? "",
+    language: json['language'] ?? "",
+    price: json['price'] is int
+        ? json['price']
+        : int.tryParse(json['price']?.toString() ?? "0"),
+    initialPrice: json['initial_price'] is int
+        ? json['initial_price']
+        : int.tryParse(json['price']?.toString() ?? "0"),
+    discountedPrice: json['discounted_price'] is int
+        ? json['discounted_price']
+        : int.tryParse(json['discounted_price']?.toString() ?? "0"),
+    discountPercent: json['discount_percent'] is int
+        ? json['discount_percent']
+        : int.tryParse(json['discount_percent']?.toString() ?? "0"),
+    deliveryCharge: json['delivery_charge'],
+    isAvailable: json['is_available'] ?? false,
+    quantityAvailable: json['quantity_available'] is int
+        ? json['quantity_available']
+        : int.tryParse(json['quantity_available']?.toString() ?? "0"),
+    previewPdfUrl: json['preview_pdf_url'] ?? "",
+    description: json['description'] ?? "",
+    features: json['features'] != null
+        ? List<String>.from(json['features'])
+        : [],
+    relatedBooks: json['related_books'] != null
+        ? List<Book>.from(json['related_books'].map((x) => Book.fromJson(x)))
+        : [],
+  );
+}
