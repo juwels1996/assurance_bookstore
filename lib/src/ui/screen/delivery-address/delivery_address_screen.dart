@@ -131,7 +131,6 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
       if (e.isCombo == true) {
         final books = e.comboBooks ?? [];
 
-        // Try to expand comboBooks -> [{book_id, quantity}]
         for (final b in books) {
           final id = _extractBookId(b);
           if (id != null) {
@@ -155,24 +154,12 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
       if (id != null) {
         cart.add({'book_id': id, 'quantity': qty});
       } else {
-        // Skip unknown single item types safely
         debugPrint('Skipped cart item without id: $e');
       }
     }
 
-    // After cart items are prepared, proceed with the next steps:
-    final deliveryType = widget
-        .paymentMethod; // Retrieve the selected payment method (bkash / cod)
-
-    // If Cash on Delivery (COD), submit the order directly
-    if (deliveryType == 'cod') {
-      _submitOrder(cart, deliveryType);
-    }
-    // If online payment method (e.g., bKash), navigate to the payment screen first
-    else {
-      _navigateToPaymentScreen(cart, deliveryType);
-    }
-
+    // Removed the API and navigation logic from here.
+    // It just returns the cart now.
     return cart;
   }
 
@@ -435,22 +422,29 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
     List<Map<String, dynamic>> cart,
     String deliveryType,
   ) async {
-    // Submit the order using the cart items and delivery type
+    // 1. Submit the order to the backend
     final order = await checkoutController.submitOrder(
       cart,
       deliveryType: deliveryType,
     );
 
     if (order != null) {
+      // 2. Clear the cart immediately so it's empty for the next purchase
+      Get.find<CartController>().clearCart();
+
+      // 3. If it's COD, generate and show the PDF.
+      // The 'await' makes sure it stays here until the user closes the PDF screen.
       if (deliveryType == 'cod') {
-        await generateAndShowPdf(); // Call the function created in Step 2
+        await generateAndShowPdf();
       }
+
+      // 4. Show the success message
       Get.snackbar(
         'Order Success',
         'Order #${order['order_id']} submitted successfully',
       );
 
-      // Get.back();
+      // 5. Send them back to the Home Screen
       Get.offAll(() => HomePage());
     }
   }
@@ -538,7 +532,19 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: _buildCartItems, // <-- proceed without saving
+                    onPressed: () {
+                      // 1. Build cart
+                      final cartData = _buildCartItems();
+                      if (cartData.isEmpty) return;
+
+                      // 2. Route based on payment method
+                      if (widget.paymentMethod == 'cod') {
+                        _submitOrder(cartData, widget.paymentMethod);
+                      } else {
+                        _navigateToPaymentScreen(
+                            cartData, widget.paymentMethod);
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
@@ -546,17 +552,17 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                       ),
                     ),
                     child: const Text(
-                      "Current Address",
-                      style: TextStyle(color: Colors.white),
+                      "Use Current Address",
+                      style: TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () =>
-                        setState(() => isEditing = true), // <-- go to form
-                    child: const Text("New Address Add"),
+                    onPressed: () => setState(() => isEditing = true),
+                    child: const Text("Add New Address",
+                        style: TextStyle(fontSize: 13)),
                   ),
                 ),
               ],
@@ -692,12 +698,15 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   }
 
   Widget _buildSaveButton() {
+    // If it is 'cod', it's Cash on Delivery. Otherwise, it is bKash or Home Delivery prepay.
     final isBkash = widget.paymentMethod != 'cod';
     final btnText = isBkash ? "Continue to bKash" : "Confirm Order";
 
     return ElevatedButton.icon(
       onPressed: () async {
         print("tapppp print----------");
+
+        // 1. Save Address info
         final addressData = {
           'name': nameController.text,
           'phone': phoneController.text,
@@ -716,19 +725,35 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
           });
         }
 
-        _buildCartItems(); // never saves again
+        // 2. Build Cart Items
+        final cartData = _buildCartItems();
+        if (cartData.isEmpty) {
+          Get.snackbar("Error", "Your cart is empty or invalid.");
+          return;
+        }
+
+        // 3. Check Payment Method and Route Accordingly
+        if (widget.paymentMethod == 'cod') {
+          // It's COD -> Skip payment gateway and submit directly to backend
+          _submitOrder(cartData, widget.paymentMethod);
+        } else {
+          // It's bKash or Home Delivery -> Go to payment screen
+          _navigateToPaymentScreen(cartData, widget.paymentMethod);
+        }
       },
       icon: isBkash
           ? Image.asset("assets/images/bkash.png", height: 25.h, width: 30.w)
-          : SizedBox(),
+          : const SizedBox(),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
+        backgroundColor:
+            isBkash ? Colors.pink : Colors.green, // Visual cue for COD
         minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       label: Text(
         btnText,
-        style: const TextStyle(fontSize: 16, color: Colors.white),
+        style: const TextStyle(
+            fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
       ),
     );
   }
