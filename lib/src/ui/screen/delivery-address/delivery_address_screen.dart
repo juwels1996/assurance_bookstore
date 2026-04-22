@@ -18,6 +18,7 @@ import '../../../core/models/districts.dart';
 import '../../../core/models/upazilla.dart';
 import '../../../core/models/upzila_model.dart';
 import '../bkash-payment/bkash_payment_screen.dart';
+import '../invoice_Screen.dart';
 import 'order_success_screen.dart';
 
 class DeliveryAddressScreen extends StatefulWidget {
@@ -418,10 +419,41 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   //   );
   // }
 
+  // void _submitOrder(
+  //   List<Map<String, dynamic>> cart,
+  //   String deliveryType,
+  // ) async {
+  //   // 1. Submit the order to the backend
+  //   final order = await checkoutController.submitOrder(
+  //     cart,
+  //     deliveryType: deliveryType,
+  //   );
+  //
+  //   if (order != null) {
+  //     // 2. Clear the cart immediately so it's empty for the next purchase
+  //     Get.find<CartController>().clearCart();
+  //
+  //     // 3. If it's COD, generate and show the PDF.
+  //     // The 'await' makes sure it stays here until the user closes the PDF screen.
+  //     if (deliveryType == 'cod') {
+  //       await generateAndShowPdf();
+  //     }
+  //
+  //     // 4. Show the success message
+  //     Get.snackbar(
+  //       'Order Success',
+  //       'Order #${order['order_id']} submitted successfully',
+  //     );
+  //
+  //     // 5. Send them back to the Home Screen
+  //     Get.offAll(() => HomePage());
+  //   }
+  // }
+
   void _submitOrder(
-    List<Map<String, dynamic>> cart,
-    String deliveryType,
-  ) async {
+      List<Map<String, dynamic>> cart,
+      String deliveryType,
+      ) async {
     // 1. Submit the order to the backend
     final order = await checkoutController.submitOrder(
       cart,
@@ -448,6 +480,8 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
       Get.offAll(() => HomePage());
     }
   }
+
+
 
   void _navigateToPaymentScreen(
     List<Map<String, dynamic>> cart,

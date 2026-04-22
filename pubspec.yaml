@@ -75,6 +75,7 @@ dependencies:
   universal_html: ^2.0.10
   get_storage:
   syncfusion_flutter_pdf: ^32.2.9
+  webview_flutter: ^4.4.2
 
 
 
