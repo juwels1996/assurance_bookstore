@@ -451,9 +451,9 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   // }
 
   void _submitOrder(
-      List<Map<String, dynamic>> cart,
-      String deliveryType,
-      ) async {
+    List<Map<String, dynamic>> cart,
+    String deliveryType,
+  ) async {
     // 1. Submit the order to the backend
     final order = await checkoutController.submitOrder(
       cart,
@@ -461,11 +461,9 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
     );
 
     if (order != null) {
-      // 2. Clear the cart immediately so it's empty for the next purchase
+      print("order is okkk");
       Get.find<CartController>().clearCart();
 
-      // 3. If it's COD, generate and show the PDF.
-      // The 'await' makes sure it stays here until the user closes the PDF screen.
       if (deliveryType == 'cod') {
         await generateAndShowPdf();
       }
@@ -480,8 +478,6 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
       Get.offAll(() => HomePage());
     }
   }
-
-
 
   void _navigateToPaymentScreen(
     List<Map<String, dynamic>> cart,

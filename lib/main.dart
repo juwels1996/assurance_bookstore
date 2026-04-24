@@ -3,7 +3,6 @@ import 'package:assurance_bookstore/src/core/controllers/book-controller/bookdet
 import 'package:assurance_bookstore/src/core/controllers/cart-controller/cart_controller.dart';
 import 'package:assurance_bookstore/src/core/controllers/checkout-controller/checkout_controller.dart';
 import 'package:assurance_bookstore/src/core/controllers/home/home_controller.dart';
-import 'package:assurance_bookstore/src/ui/screen/auth/login_screen.dart';
 import 'package:assurance_bookstore/src/ui/screen/book-details/book-details_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,8 +10,6 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get_storage/get_storage.dart';
 import 'src/ui/screen/home/home_page.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'package:flutter/foundation.dart';
 
 final routeObserver = RouteObserver<PageRoute>();
 
