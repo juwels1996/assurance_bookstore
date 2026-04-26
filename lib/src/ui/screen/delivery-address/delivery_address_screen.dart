@@ -462,11 +462,12 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
 
     if (order != null) {
       print("order is okkk");
-      Get.find<CartController>().clearCart();
 
       if (deliveryType == 'cod') {
         await generateAndShowPdf();
       }
+
+      Get.find<CartController>().clearCart();
 
       // 4. Show the success message
       Get.snackbar(
@@ -493,6 +494,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
       );
 
       if (order != null) {
+        Get.find<CartController>().clearCart();
         Get.snackbar(
           'Order Success',
           'Order #${order['order_id']} submitted successfully',
