@@ -463,20 +463,24 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
     if (order != null) {
       print("order is okkk");
 
-      if (deliveryType == 'cod') {
-        await generateAndShowPdf();
-      }
+      // if (deliveryType == 'cod') {
+      //   await generateAndShowPdf();
+      // }
 
       Get.find<CartController>().clearCart();
 
       // 4. Show the success message
-      Get.snackbar(
-        'Order Success',
-        'Order #${order['order_id']} submitted successfully',
-      );
+      // Get.snackbar(
+      //   'Order Success',
+      //   'Order #${order['order_id']} submitted successfully',
+      // );
 
-      // 5. Send them back to the Home Screen
-      Get.offAll(() => HomePage());
+      // 5. Send them to Order Success Screen
+      Get.offAll(() => OrderSuccessScreen(
+            orderId: order['order_id'],
+            amount: (order['amount'] ?? 0).toDouble(),
+            orderData: order,
+          ));
     }
   }
 
@@ -484,24 +488,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
     List<Map<String, dynamic>> cart,
     String deliveryType,
   ) async {
-    final result = await Get.to(() => PaymentScreen());
-
-    if (result == true) {
-      // If payment was successful, submit the order
-      final order = await checkoutController.submitOrder(
-        cart,
-        deliveryType: deliveryType,
-      );
-
-      if (order != null) {
-        Get.find<CartController>().clearCart();
-        Get.snackbar(
-          'Order Success',
-          'Order #${order['order_id']} submitted successfully',
-        );
-        Get.offAll(() => HomePage());
-      }
-    }
+    Get.to(() => PaymentScreen());
   }
 
   @override
@@ -525,10 +512,10 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
             Text("Selected Payment Method: ${widget.paymentMethod}"),
             if (widget.paymentMethod == 'cod')
               const Text(
-                "Cash on Delivery selected. Special delivery logic applied.",
+                "Cash on Delivery selected. Pay delivery charge now.",
               )
             else
-              const Text("bKash selected. User will pay via bKash."),
+              const Text("bKash selected. User will pay full amount via bKash."),
             const SizedBox(height: 20),
             _buildSaveButton(),
           ],
@@ -570,12 +557,11 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                       if (cartData.isEmpty) return;
 
                       // 2. Route based on payment method
-                      if (widget.paymentMethod == 'cod') {
-                        _submitOrder(cartData, widget.paymentMethod);
-                      } else {
-                        _navigateToPaymentScreen(
-                            cartData, widget.paymentMethod);
-                      }
+                      // if (widget.paymentMethod == 'cod') {
+                      //   _submitOrder(cartData, widget.paymentMethod);
+                      // } else {
+                      _navigateToPaymentScreen(cartData, widget.paymentMethod);
+                      // }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
@@ -731,8 +717,9 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
 
   Widget _buildSaveButton() {
     // If it is 'cod', it's Cash on Delivery. Otherwise, it is bKash or Home Delivery prepay.
-    final isBkash = widget.paymentMethod != 'cod';
-    final btnText = isBkash ? "Continue to bKash" : "Confirm Order";
+    final isCod = widget.paymentMethod == 'cod';
+    final btnText =
+        isCod ? "Confirm & Pay Delivery Charge" : "Continue to bKash";
 
     return ElevatedButton.icon(
       onPressed: () async {
@@ -764,21 +751,12 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
           return;
         }
 
-        // 3. Check Payment Method and Route Accordingly
-        if (widget.paymentMethod == 'cod') {
-          // It's COD -> Skip payment gateway and submit directly to backend
-          _submitOrder(cartData, widget.paymentMethod);
-        } else {
-          // It's bKash or Home Delivery -> Go to payment screen
-          _navigateToPaymentScreen(cartData, widget.paymentMethod);
-        }
+        // 3. Go to payment screen
+        _navigateToPaymentScreen(cartData, widget.paymentMethod);
       },
-      icon: isBkash
-          ? Image.asset("assets/images/bkash.png", height: 25.h, width: 30.w)
-          : const SizedBox(),
+      icon: Image.asset("assets/images/bkash.png", height: 25.h, width: 30.w),
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-            isBkash ? Colors.pink : Colors.green, // Visual cue for COD
+        backgroundColor: Colors.pink, // bKash color
         minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),

@@ -7,6 +7,9 @@ import 'package:http/http.dart' as http;
 import '../../../core/controllers/auth/auth_controller.dart';
 import '../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../../core/controllers/checkout-controller/checkout_controller.dart';
+import '../delivery-address/order_success_screen.dart';
+import '../home/home_page.dart';
+import '../invoice_Screen.dart';
 
 class PaymentScreen extends StatefulWidget {
   @override
@@ -18,8 +21,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
   void initState() {
     super.initState();
 
-    _createWebPayment();
-    _checkPaymentResult();
+    final uri = Uri.base;
+    final isCallback = uri.toString().contains("payment-success") ||
+        uri.queryParameters.containsKey('status');
+
+    if (isCallback) {
+      _checkPaymentResult();
+    } else {
+      _createWebPayment();
+    }
 
     html.window.addEventListener("type", (event) {
       print('==>>>>==${html.window.location.href}');
@@ -31,7 +41,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       print('==<<<<<<<==${html.window.location.href}');
       final uri = Uri.base;
       if (uri.toString().contains("payment-success")) {
-        handleCallbackUrl(uri.toString());
+        _checkPaymentResult();
       }
     });
   }
@@ -181,11 +191,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
       // Step 2: Calculate total amount including delivery charge
       final bookAmount = order['amount'] ?? 0;
       final deliveryCharge = cartController.totalDeliveryCharge;
-      final totalAmount = bookAmount + deliveryCharge;
+
+      final isCod = cartController.paymentMethod.value == 'cod';
+      final totalAmount =
+          isCod ? deliveryCharge : (bookAmount + deliveryCharge);
 
       print("Book Amount: $bookAmount");
       print("Delivery Charge: $deliveryCharge");
-      print("Total Amount: $totalAmount");
+      print("Total Amount to pay now: $totalAmount");
 
       // Step 3: Call backend to create bKash payment
       final response = await http.post(
@@ -207,71 +220,85 @@ class _PaymentScreenState extends State<PaymentScreen> {
         String? gatewayPageURL = responseData['bkashURL'];
 
         if (gatewayPageURL != null) {
-          html.window.open(gatewayPageURL, "_blank");
-          // Optionally navigate to Home or Cart screen immediately
-          // Get.offAll(() => HomePage());
+          // Store order data in localStorage to retrieve after redirect
+          html.window.localStorage['pending_order_id'] = orderId.toString();
+          html.window.localStorage['pending_order_data'] = json.encode(order);
+          html.window.localStorage['pending_order_amount'] =
+              totalAmount.toString();
+
+          // Open bKash
+          html.window.open(gatewayPageURL, "_self");
         } else {
           print("Error: 'bkashURL' is null in the response.");
+          Get.back();
+          Get.snackbar(
+              "Error", "Could not initiate payment. Please try again.");
         }
       } else {
         print("Failed to create bKash payment: ${response.statusCode}");
         print("Response body: ${response.body}");
+        Get.back();
+        Get.snackbar("Error", "Failed to initiate bKash payment.");
       }
     } catch (e) {
-      print("Exception: $e");
+      print("Exception in _createWebPayment: $e");
+      Get.back();
+      Get.snackbar("Error", "An unexpected error occurred.");
     }
   }
 
   void handleCallbackUrl(String url) {
-    final uri = Uri.parse(url);
-    final paymentID = uri.queryParameters['paymentID'];
-    final status = uri.queryParameters['status'];
-
-    if (paymentID != null && status == 'success') {
-      Get.snackbar("Payment Successful", "Your payment was successful!");
-
-      Get.back();
-    } else if (status == 'failure') {
-      Get.snackbar("Payment Failed", "Your payment failed.");
-      Get.back();
-    } else if (status == 'cancel') {
-      Get.snackbar("Payment Cancelled", "You cancelled the payment.");
-      Get.back();
-    } else {
-      Get.snackbar("Error", "Missing payment details.");
-    }
+    _checkPaymentResult();
   }
 
-  void _checkPaymentResult() async {
+  void _checkPaymentResult() {
     final uri = Uri.base;
     final status = uri.queryParameters['status'];
 
-    if (uri.toString().contains("payment-success") && status == "Completed") {
-      final cartItems = Get.find<CartController>().cartItems
-          .map(
-            (e) => {
-              'book_id': (e.item as dynamic).id,
-              'quantity': e.quantity.value,
-            },
-          )
-          .toList();
+    if (uri.toString().contains("payment-success") || status == "Completed") {
+      final orderIdStr = html.window.localStorage['pending_order_id'];
+      final orderDataStr = html.window.localStorage['pending_order_data'];
+      final amountStr = html.window.localStorage['pending_order_amount'];
 
-      final checkoutController = Get.find<CheckoutController>();
-      final cartController = Get.find<CartController>();
-      final order = await checkoutController.submitOrder(
-        cartItems,
-        deliveryType: cartController.paymentMethod.value,
-      );
+      if (orderIdStr != null && orderDataStr != null) {
+        final orderId = int.parse(orderIdStr);
+        final orderData = json.decode(orderDataStr);
+        final amount = double.tryParse(amountStr ?? '0') ?? 0.0;
 
-      if (order != null) {
-        Get.back();
+        // Clear storage
+        html.window.localStorage.remove('pending_order_id');
+        html.window.localStorage.remove('pending_order_data');
+        html.window.localStorage.remove('pending_order_amount');
+
+        // Clear cart
+        Get.find<CartController>().clearCart();
+
+        // Navigate to Home Page
+        Get.offAll(() => HomePage());
+
+        // Show success message with invoice link
+        Get.snackbar(
+          "Order Success",
+          "Your order #$orderId has been placed successfully!",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 10),
+          mainButton: TextButton(
+            onPressed: () => Get.to(() => InvoiceScreen(orderId: orderId)),
+            child: const Text(
+              "VIEW INVOICE",
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        );
       }
     } else if (status == "Failed") {
       Get.snackbar("Payment Failed", "Please try again.");
-      Get.back();
+      Get.offAll(() => HomePage());
     } else if (status == "Cancelled") {
       Get.snackbar("Payment Cancelled", "You cancelled the payment.");
-      Get.back();
+      Get.offAll(() => HomePage());
     }
   }
 

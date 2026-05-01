@@ -17,8 +17,8 @@ class CartItem<T> {
     int quantity = 1,
     this.isCombo = false,
     List<Book>? comboBooks,
-  }) : quantity = quantity.obs,
-       comboBooks = comboBooks ?? [];
+  })  : quantity = quantity.obs,
+        comboBooks = comboBooks ?? [];
 }
 
 class CartController extends GetxController {
@@ -113,22 +113,22 @@ class CartController extends GetxController {
 
   /// Total amount (supports combo)
   int get totalAmount => cartItems.fold(0, (sum, cartItem) {
-    if (cartItem.isCombo) {
-      // sum of all books in the combo
-      final comboPrice = cartItem.comboBooks!.fold<int>(
-        0,
-        (sub, book) => sub + (book.price ?? book.discountedPrice),
-      );
-      return sum + comboPrice * cartItem.quantity.value;
-    } else if (cartItem.item is Book) {
-      final book = cartItem.item as Book;
-      return sum + (book.price ?? book.price) * cartItem.quantity.value;
-    } else if (cartItem.item is BookDetail) {
-      final book = cartItem.item as BookDetail;
-      return sum + (book.price ?? book.price)! * cartItem.quantity.value;
-    }
-    return sum;
-  });
+        if (cartItem.isCombo) {
+          // sum of all books in the combo
+          final comboPrice = cartItem.comboBooks!.fold<int>(
+            0,
+            (sub, book) => sub + (book.price ?? book.discountedPrice),
+          );
+          return sum + comboPrice * cartItem.quantity.value;
+        } else if (cartItem.item is Book) {
+          final book = cartItem.item as Book;
+          return sum + (book.price ?? book.price) * cartItem.quantity.value;
+        } else if (cartItem.item is BookDetail) {
+          final book = cartItem.item as BookDetail;
+          return sum + (book.price ?? book.price)! * cartItem.quantity.value;
+        }
+        return sum;
+      });
 
   /// Delivery charge (free if any combo)
   int get totalDeliveryCharge {

@@ -82,6 +82,25 @@ class OrderSuccessScreen extends StatelessWidget {
     }
   }
 
+  Widget _buildPriceRow(String label, String value,
+      {bool isBold = false, Color? valueColor}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label,
+              style: TextStyle(
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          Text(value,
+              style: TextStyle(
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                  color: valueColor)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,12 +128,60 @@ class OrderSuccessScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              Text('Order ID: #$orderId', style: const TextStyle(fontSize: 16)),
-              if (amount != null)
-                Text(
-                  'Total Amount: ৳$amount',
-                  style: const TextStyle(fontSize: 16),
-                ),
+              Text('Order ID: #$orderId',
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Builder(builder: (context) {
+                final isCod = orderData['delivery_type'] == 'cod';
+                final bookAmount = (orderData['amount'] ?? 0).toDouble();
+                final paidAmount = (amount ?? 0).toDouble();
+
+                if (isCod) {
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green.shade200),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "Cash on Delivery Payment Summary",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        const Divider(),
+                        _buildPriceRow("Book Price:", "৳$bookAmount"),
+                        _buildPriceRow("Delivery Charge (PAID):", "৳$paidAmount",
+                            valueColor: Colors.green),
+                        const Divider(),
+                        _buildPriceRow("Amount to Pay on Delivery:",
+                            "৳$bookAmount",
+                            isBold: true, valueColor: Colors.red),
+                        const SizedBox(height: 12),
+                        const Text(
+                          "আপনি ডেলিভারি চার্জ বিকাশ করেছেন। বই পাওয়ার সময় শুধু বইয়ের দাম পরিশোধ করবেন।",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blueGrey,
+                              fontFamily: 'kalpurush'),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return Text(
+                    'Total Amount (Paid): ৳$paidAmount',
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green),
+                  );
+                }
+              }),
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
