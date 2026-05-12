@@ -14,6 +14,111 @@ import '../invoice_Screen.dart';
 class PaymentScreen extends StatefulWidget {
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
+
+  /// Call this from HomePage.initState so cold-start callback URLs are handled.
+  static void checkAndHandleCallback(BuildContext context) {
+    final fullUrl = html.window.location.href;
+    if (!fullUrl.contains('payment-success')) return;
+
+    // Parse status from URL (supports both hash fragment and plain query)
+    String status = '';
+    String trxId = '';
+    final uri = Uri.parse(fullUrl);
+    status = uri.queryParameters['status'] ?? '';
+    trxId = uri.queryParameters['trxID'] ?? '';
+    if (status.isEmpty && uri.fragment.contains('?')) {
+      final fq = uri.fragment.split('?').last;
+      final fp = Uri.splitQueryString(fq);
+      status = fp['status'] ?? '';
+      trxId = fp['trxID'] ?? '';
+    }
+
+    if (status != 'Completed') {
+      // Clear storage for failed/cancelled
+      html.window.localStorage.remove('pending_order_id');
+      html.window.localStorage.remove('pending_order_data');
+      html.window.localStorage.remove('pending_order_amount');
+      html.window.localStorage.remove('pending_is_cod');
+
+      if (status == 'Failed' || status == 'failure') {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          Get.snackbar('পেমেন্ট ব্যর্থ হয়েছে', 'আবার চেষ্টা করুন।',
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              snackPosition: SnackPosition.TOP);
+        });
+      } else if (status == 'Cancelled' || status == 'cancel') {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          Get.snackbar('পেমেন্ট বাতিল হয়েছে', 'আপনি পেমেন্ট বাতিল করেছেন.',
+              snackPosition: SnackPosition.TOP);
+        });
+      }
+      return;
+    }
+
+    // Completed — retrieve stored order data
+    final orderIdStr = html.window.localStorage['pending_order_id'];
+    final orderDataStr = html.window.localStorage['pending_order_data'];
+    final amountStr = html.window.localStorage['pending_order_amount'];
+    final isCodStr = html.window.localStorage['pending_is_cod'];
+
+    html.window.localStorage.remove('pending_order_id');
+    html.window.localStorage.remove('pending_order_data');
+    html.window.localStorage.remove('pending_order_amount');
+    html.window.localStorage.remove('pending_is_cod');
+
+    try {
+      Get.find<CartController>().clearCart();
+    } catch (_) {}
+
+    if (orderIdStr == null || orderDataStr == null) return;
+
+    final orderId = int.tryParse(orderIdStr) ?? 0;
+    final orderData = json.decode(orderDataStr);
+    final amountPaid = double.tryParse(amountStr ?? '0') ?? 0.0;
+    final isCod = isCodStr == 'true';
+
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (isCod) {
+        final rawAmount = orderData['amount'];
+        final bookAmount = rawAmount is int
+            ? rawAmount.toDouble()
+            : double.tryParse(rawAmount?.toString() ?? '0') ?? 0.0;
+        Get.snackbar(
+          'অর্ডার নিশ্চিত হয়েছে (Cash on Delivery) ✓',
+          'ডেলিভারি চার্জ ${amountPaid.toInt()}tk bKash-এ পরিশোধিত।\n'
+              'বইয়ের মূল্য ${bookAmount.toInt()}tk ডেলিভারিতে দিন।',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 15),
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(12),
+          mainButton: TextButton(
+            onPressed: () => Get.to(() => InvoiceScreen(orderId: orderId)),
+            child: const Text('ইনভয়েস দেখুন',
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        );
+      } else {
+        Get.snackbar(
+          'অর্ডার সফলভাবে সম্পন্ন হয়েছে ✓',
+          'অর্ডার #$orderId নিশ্চিত হয়েছে।\nধন্যবাদ Assurance Publications-এ অর্ডার করার জন্য।',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 15),
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(12),
+          mainButton: TextButton(
+            onPressed: () => Get.to(() => InvoiceScreen(orderId: orderId)),
+            child: const Text('ইনভয়েস দেখুন',
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        );
+      }
+    });
+  }
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
@@ -22,11 +127,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
     super.initState();
 
     final fullUrl = html.window.location.href;
-    final isCallback = fullUrl.contains("payment-success") ||
-        Uri.parse(fullUrl).queryParameters.containsKey('status');
+    final isCallback = fullUrl.contains("payment-success");
 
     if (isCallback) {
-      _checkPaymentResult();
+      // Run after first frame so GetX navigation works correctly
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkPaymentResult();
+      });
     } else {
       _createWebPayment();
     }
@@ -247,98 +354,129 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   void _checkPaymentResult() {
     final fullUrl = html.window.location.href;
+
+    // Parse status and trxID from URL — supports both hash fragment and plain query
+    // e.g. https://assurancepublication.com/#/payment-success?status=Completed&trxID=XXX
+    String status = '';
+    String trxId = '';
+
     final uri = Uri.parse(fullUrl);
 
-    // Support both hash-routed (#/payment-success?...) and plain query params
-    String status = uri.queryParameters['status'] ?? '';
-    String trxId = uri.queryParameters['trxID'] ?? '';
+    // Try plain query params first
+    status = uri.queryParameters['status'] ?? '';
+    trxId = uri.queryParameters['trxID'] ?? '';
 
-    // For hash routing: parse fragment manually e.g. "#/payment-success?status=Completed&trxID=..."
-    if (status.isEmpty && uri.fragment.isNotEmpty) {
-      final fragmentUri = Uri.tryParse(
-          '/?${uri.fragment.contains('?') ? uri.fragment.split('?').last : ''}');
-      status = fragmentUri?.queryParameters['status'] ?? '';
-      trxId = fragmentUri?.queryParameters['trxID'] ?? '';
+    // Then try hash fragment: #/payment-success?status=Completed&trxID=...
+    if ((status.isEmpty) && uri.fragment.contains('?')) {
+      final fragmentQuery = uri.fragment.split('?').last;
+      final fragmentParams = Uri.splitQueryString(fragmentQuery);
+      status = fragmentParams['status'] ?? '';
+      trxId = fragmentParams['trxID'] ?? '';
     }
 
-    final isSuccessUrl = fullUrl.contains("payment-success");
+    print('Payment callback — status: $status, trxID: $trxId');
 
-    if (!isSuccessUrl && status.isEmpty)
-      return; // not a payment callback at all
-
-    if (status == "Completed" || (isSuccessUrl && status.isEmpty)) {
+    if (status == 'Completed') {
       final orderIdStr = html.window.localStorage['pending_order_id'];
       final orderDataStr = html.window.localStorage['pending_order_data'];
       final amountStr = html.window.localStorage['pending_order_amount'];
       final isCodStr = html.window.localStorage['pending_is_cod'];
 
+      // Clear localStorage immediately
+      html.window.localStorage.remove('pending_order_id');
+      html.window.localStorage.remove('pending_order_data');
+      html.window.localStorage.remove('pending_order_amount');
+      html.window.localStorage.remove('pending_is_cod');
+
+      // Clear cart
+      try {
+        Get.find<CartController>().clearCart();
+      } catch (_) {}
+
+      // Navigate to home first
+      Get.offAll(() => HomePage());
+
+      // Show invoice snackbar after a short delay so HomePage is fully built
       if (orderIdStr != null && orderDataStr != null) {
-        final orderId = int.parse(orderIdStr);
+        final orderId = int.tryParse(orderIdStr) ?? 0;
         final orderData = json.decode(orderDataStr);
         final amountPaid = double.tryParse(amountStr ?? '0') ?? 0.0;
         final isCod = isCodStr == 'true';
 
-        // Clear storage
-        html.window.localStorage.remove('pending_order_id');
-        html.window.localStorage.remove('pending_order_data');
-        html.window.localStorage.remove('pending_order_amount');
-        html.window.localStorage.remove('pending_is_cod');
+        Future.delayed(const Duration(milliseconds: 800), () {
+          if (isCod) {
+            final rawAmount = orderData['amount'];
+            final bookAmount = rawAmount is int
+                ? rawAmount.toDouble()
+                : double.tryParse(rawAmount?.toString() ?? '0') ?? 0.0;
 
-        // Clear cart
-        Get.find<CartController>().clearCart();
-
-        // Navigate to Home Page
-        Get.offAll(() => HomePage());
-
-        if (isCod) {
-          final bookAmount = (orderData['amount'] ?? 0) is int
-              ? (orderData['amount'] as int).toDouble()
-              : double.tryParse(orderData['amount'].toString()) ?? 0.0;
-          Get.snackbar(
-            "Order Confirmed (Cash on Delivery)",
-            "Delivery charge ${amountPaid.toInt()}tk paid via bKash ✓\n"
-                "Book amount due on delivery: ${bookAmount.toInt()}tk",
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            duration: const Duration(seconds: 12),
-            mainButton: TextButton(
-              onPressed: () => Get.to(() => InvoiceScreen(orderId: orderId)),
-              child: const Text("VIEW INVOICE",
+            Get.snackbar(
+              "অর্ডার নিশ্চিত হয়েছে (Cash on Delivery) ✓",
+              "ডেলিভারি চার্জ ${amountPaid.toInt()}tk bKash-এ পরিশোধিত।\n"
+                  "বইয়ের মূল্য ${bookAmount.toInt()}tk ডেলিভারিতে দিন।",
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 15),
+              snackPosition: SnackPosition.TOP,
+              margin: const EdgeInsets.all(12),
+              mainButton: TextButton(
+                onPressed: () => Get.to(() => InvoiceScreen(orderId: orderId)),
+                child: const Text(
+                  "ইনভয়েস দেখুন",
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          );
-        } else {
-          Get.snackbar(
-            "Order Placed Successfully!",
-            "Your order #$orderId has been confirmed.",
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            duration: const Duration(seconds: 10),
-            mainButton: TextButton(
-              onPressed: () => Get.to(() => InvoiceScreen(orderId: orderId)),
-              child: const Text("VIEW INVOICE",
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          } else {
+            Get.snackbar(
+              "অর্ডার সফলভাবে সম্পন্ন হয়েছে ✓",
+              "আপনার অর্ডার #$orderId নিশ্চিত হয়েছে।\nধন্যবাদ Assurance Publications-এ অর্ডার করার জন্য।",
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 15),
+              snackPosition: SnackPosition.TOP,
+              margin: const EdgeInsets.all(12),
+              mainButton: TextButton(
+                onPressed: () => Get.to(() => InvoiceScreen(orderId: orderId)),
+                child: const Text(
+                  "ইনভয়েস দেখুন",
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          );
-        }
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }
+        });
       }
-    } else if (status == "Failed" || status == "failure") {
+    } else if (status == 'Failed' || status == 'failure') {
       html.window.localStorage.remove('pending_order_id');
       html.window.localStorage.remove('pending_order_data');
       html.window.localStorage.remove('pending_order_amount');
       html.window.localStorage.remove('pending_is_cod');
-      Get.snackbar("Payment Failed", "Please try again.",
-          backgroundColor: Colors.red, colorText: Colors.white);
       Get.offAll(() => HomePage());
-    } else if (status == "Cancelled" || status == "cancel") {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        Get.snackbar(
+          "পেমেন্ট ব্যর্থ হয়েছে",
+          "আবার চেষ্টা করুন।",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+        );
+      });
+    } else if (status == 'Cancelled' || status == 'cancel') {
       html.window.localStorage.remove('pending_order_id');
       html.window.localStorage.remove('pending_order_data');
       html.window.localStorage.remove('pending_order_amount');
       html.window.localStorage.remove('pending_is_cod');
-      Get.snackbar("Payment Cancelled", "You cancelled the payment.");
       Get.offAll(() => HomePage());
+      Future.delayed(const Duration(milliseconds: 500), () {
+        Get.snackbar(
+          "পেমেন্ট বাতিল হয়েছে",
+          "আপনি পেমেন্ট বাতিল করেছেন।",
+          snackPosition: SnackPosition.TOP,
+        );
+      });
     }
   }
 

@@ -9,6 +9,7 @@ import '../../../core/controllers/home/home_controller.dart';
 import '../../../core/models/home/home_page_data.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/responsive.dart';
+import '../bkash-payment/bkash_payment_screen.dart';
 import 'components/banner_scroll_widget.dart';
 
 import 'components/book_card.dart' hide Responsive;
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       homeController.fetchHomeData();
       homeController.loadBanners();
+      PaymentScreen.checkAndHandleCallback(context);
     });
   }
 

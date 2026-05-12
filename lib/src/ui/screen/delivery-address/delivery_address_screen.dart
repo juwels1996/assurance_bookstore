@@ -511,19 +511,19 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
             const SizedBox(height: 20),
             if (widget.paymentMethod == 'cod')
               const Text(
-                "Cash on Delivery: Pay delivery charge now via bKash.\nBook amount will be collected at your door.",
+                "শুধু Delivery Charge পেমেন্ট করুন।\n বই হাতে পেয়ে বইয়ের মূল্য পরিশোধ করুন। (Via bKash)",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.orange, fontSize: 13),
               )
             else if (widget.paymentMethod == 'hd')
               const Text(
-                "Home Delivery: Full amount will be paid via bKash.",
+                "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.blue, fontSize: 13),
               )
             else
               const Text(
-                "Courier Delivery: Full amount will be paid via bKash.",
+                "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.blue, fontSize: 13),
               ),
@@ -687,13 +687,13 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
               const Divider(),
               if (isCod) ...[
                 _buildSummaryRowBkash(
-                  "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)",
+                  "Pay Now via bKash (Delivery)",
                   "$delivery Tk",
                   isBold: true,
                   valueColor: Colors.pink,
                 ),
                 _buildSummaryRowBkash(
-                  "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)",
+                  "Pay on Delivery (Books)",
                   "$subtotal Tk",
                   isBold: true,
                   valueColor: Colors.orange,
@@ -746,8 +746,8 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
     final btnText = isCod
         ? "Pay Delivery Charge via bKash"
         : widget.paymentMethod == 'hd'
-            ? "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)"
-            : "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)";
+            ? "Pay Full Amount via bKash"
+            : "Pay Full Amount via bKash";
 
     return ElevatedButton.icon(
       onPressed: () async {

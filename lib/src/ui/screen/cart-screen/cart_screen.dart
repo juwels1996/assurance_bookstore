@@ -377,7 +377,8 @@ class _CartScreenState extends State<CartScreen> {
                             children: [
                               _buildModernDeliveryOption(
                                 title: "Courier / Office",
-                                subtitle: "Full payment required via bKash",
+                                subtitle:
+                                    "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)",
                                 value: 'bkash',
                                 icon: Icons.local_shipping_outlined,
                                 groupValue: cartController.paymentMethod.value,
@@ -387,7 +388,8 @@ class _CartScreenState extends State<CartScreen> {
                               const SizedBox(height: 10),
                               _buildModernDeliveryOption(
                                 title: "Home Delivery",
-                                subtitle: "Full payment required via bKash",
+                                subtitle:
+                                    "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)",
                                 value: 'hd',
                                 icon: Icons.home_work_outlined,
                                 groupValue: cartController.paymentMethod.value,
@@ -398,7 +400,7 @@ class _CartScreenState extends State<CartScreen> {
                               _buildModernDeliveryOption(
                                 title: "Cash on Delivery",
                                 subtitle:
-                                    "Pay delivery charge via bKash now, book cost on delivery",
+                                    "শুধু Delivery Charge পেমেন্ট করুন। বই হাতে পেয়ে বইয়ের মূল্য পরিশোধ করুন। (Via bKash)",
                                 value: 'cod',
                                 icon: Icons.payments_outlined,
                                 groupValue: cartController.paymentMethod.value,
