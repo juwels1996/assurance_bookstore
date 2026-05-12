@@ -509,13 +509,24 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
             const SizedBox(height: 20),
             _buildOrderSummaryBkash(),
             const SizedBox(height: 20),
-            Text("Selected Payment Method: ${widget.paymentMethod}"),
             if (widget.paymentMethod == 'cod')
               const Text(
-                "Cash on Delivery selected. Pay delivery charge now.",
+                "Cash on Delivery: Pay delivery charge now via bKash.\nBook amount will be collected at your door.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.orange, fontSize: 13),
+              )
+            else if (widget.paymentMethod == 'hd')
+              const Text(
+                "Home Delivery: Full amount will be paid via bKash.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.blue, fontSize: 13),
               )
             else
-              const Text("bKash selected. User will pay full amount via bKash."),
+              const Text(
+                "Courier Delivery: Full amount will be paid via bKash.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.blue, fontSize: 13),
+              ),
             const SizedBox(height: 20),
             _buildSaveButton(),
           ],
@@ -652,38 +663,53 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   }
 
   Widget _buildOrderSummaryBkash() {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Text(
-              "Order Summary",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            _buildSummaryRowBkash(
-              "Subtotal",
-              "${cartController.totalAmount} Tk",
-            ),
-            _buildSummaryRowBkash("VAT", "0 Tk"),
-            _buildSummaryRowBkash(
-              "Delivery Charge",
-              "${cartController.totalDeliveryCharge} Tk",
-            ),
-            const Divider(),
-            _buildSummaryRowBkash(
-              "Total Payable Amount",
-              "${cartController.totalAmount + cartController.totalDeliveryCharge} Tk",
-              isBold: true,
-              valueColor: Colors.red,
-            ),
-          ],
+    return Obx(() {
+      final isCod = widget.paymentMethod == 'cod';
+      final subtotal = cartController.totalAmount;
+      final delivery = cartController.totalDeliveryCharge;
+      final total = subtotal + delivery;
+
+      return Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 3,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              const Text(
+                "Order Summary",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              _buildSummaryRowBkash("Subtotal", "$subtotal Tk"),
+              _buildSummaryRowBkash("VAT", "0 Tk"),
+              _buildSummaryRowBkash("Delivery Charge", "$delivery Tk"),
+              const Divider(),
+              if (isCod) ...[
+                _buildSummaryRowBkash(
+                  "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)",
+                  "$delivery Tk",
+                  isBold: true,
+                  valueColor: Colors.pink,
+                ),
+                _buildSummaryRowBkash(
+                  "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)",
+                  "$subtotal Tk",
+                  isBold: true,
+                  valueColor: Colors.orange,
+                ),
+              ] else
+                _buildSummaryRowBkash(
+                  "Total Payable Amount",
+                  "$total Tk",
+                  isBold: true,
+                  valueColor: Colors.red,
+                ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildSummaryRowBkash(
@@ -716,16 +742,16 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   }
 
   Widget _buildSaveButton() {
-    // If it is 'cod', it's Cash on Delivery. Otherwise, it is bKash or Home Delivery prepay.
     final isCod = widget.paymentMethod == 'cod';
-    final btnText =
-        isCod ? "Confirm & Pay Delivery Charge" : "Continue to bKash";
+    final btnText = isCod
+        ? "Pay Delivery Charge via bKash"
+        : widget.paymentMethod == 'hd'
+            ? "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)"
+            : "অগ্রিম পেমেন্ট সম্পন্ন করুন। (Via bKash)";
 
     return ElevatedButton.icon(
       onPressed: () async {
-        print("tapppp print----------");
-
-        // 1. Save Address info
+        // 1. Save address if new/editing
         final addressData = {
           'name': nameController.text,
           'phone': phoneController.text,
@@ -751,12 +777,14 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
           return;
         }
 
-        // 3. Go to payment screen
+        // 3. Always go to bKash payment screen
+        // COD → charges delivery charge only via bKash
+        // Courier/HD → charges full amount via bKash
         _navigateToPaymentScreen(cartData, widget.paymentMethod);
       },
       icon: Image.asset("assets/images/bkash.png", height: 25.h, width: 30.w),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.pink, // bKash color
+        backgroundColor: Colors.pink,
         minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),

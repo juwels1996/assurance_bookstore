@@ -161,11 +161,11 @@ class CartController extends GetxController {
 
     // If payment method is COD, add COD surcharge (+40 flat)
     if (paymentMethod.value == 'hd') {
-      totalCharge += 40;
+      totalCharge += 3;
     }
 
     if (paymentMethod.value == 'cod') {
-      totalCharge += 40;
+      totalCharge += 3;
     }
 
     return totalCharge;

@@ -21,9 +21,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
   void initState() {
     super.initState();
 
-    final uri = Uri.base;
-    final isCallback = uri.toString().contains("payment-success") ||
-        uri.queryParameters.containsKey('status');
+    final fullUrl = html.window.location.href;
+    final isCallback = fullUrl.contains("payment-success") ||
+        Uri.parse(fullUrl).queryParameters.containsKey('status');
 
     if (isCallback) {
       _checkPaymentResult();
@@ -31,16 +31,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
       _createWebPayment();
     }
 
-    html.window.addEventListener("type", (event) {
-      print('==>>>>==${html.window.location.href}');
-    });
-
-    html.window.onPopState.listen((event) => _checkPaymentResult());
-
     html.window.onPopState.listen((event) {
-      print('==<<<<<<<==${html.window.location.href}');
-      final uri = Uri.base;
-      if (uri.toString().contains("payment-success")) {
+      final url = html.window.location.href;
+      if (url.contains("payment-success")) {
         _checkPaymentResult();
       }
     });
@@ -225,6 +218,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           html.window.localStorage['pending_order_data'] = json.encode(order);
           html.window.localStorage['pending_order_amount'] =
               totalAmount.toString();
+          html.window.localStorage['pending_is_cod'] = isCod.toString();
 
           // Open bKash
           html.window.open(gatewayPageURL, "_self");
@@ -252,23 +246,43 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _checkPaymentResult() {
-    final uri = Uri.base;
-    final status = uri.queryParameters['status'];
+    final fullUrl = html.window.location.href;
+    final uri = Uri.parse(fullUrl);
 
-    if (uri.toString().contains("payment-success") || status == "Completed") {
+    // Support both hash-routed (#/payment-success?...) and plain query params
+    String status = uri.queryParameters['status'] ?? '';
+    String trxId = uri.queryParameters['trxID'] ?? '';
+
+    // For hash routing: parse fragment manually e.g. "#/payment-success?status=Completed&trxID=..."
+    if (status.isEmpty && uri.fragment.isNotEmpty) {
+      final fragmentUri = Uri.tryParse(
+          '/?${uri.fragment.contains('?') ? uri.fragment.split('?').last : ''}');
+      status = fragmentUri?.queryParameters['status'] ?? '';
+      trxId = fragmentUri?.queryParameters['trxID'] ?? '';
+    }
+
+    final isSuccessUrl = fullUrl.contains("payment-success");
+
+    if (!isSuccessUrl && status.isEmpty)
+      return; // not a payment callback at all
+
+    if (status == "Completed" || (isSuccessUrl && status.isEmpty)) {
       final orderIdStr = html.window.localStorage['pending_order_id'];
       final orderDataStr = html.window.localStorage['pending_order_data'];
       final amountStr = html.window.localStorage['pending_order_amount'];
+      final isCodStr = html.window.localStorage['pending_is_cod'];
 
       if (orderIdStr != null && orderDataStr != null) {
         final orderId = int.parse(orderIdStr);
         final orderData = json.decode(orderDataStr);
-        final amount = double.tryParse(amountStr ?? '0') ?? 0.0;
+        final amountPaid = double.tryParse(amountStr ?? '0') ?? 0.0;
+        final isCod = isCodStr == 'true';
 
         // Clear storage
         html.window.localStorage.remove('pending_order_id');
         html.window.localStorage.remove('pending_order_data');
         html.window.localStorage.remove('pending_order_amount');
+        html.window.localStorage.remove('pending_is_cod');
 
         // Clear cart
         Get.find<CartController>().clearCart();
@@ -276,27 +290,53 @@ class _PaymentScreenState extends State<PaymentScreen> {
         // Navigate to Home Page
         Get.offAll(() => HomePage());
 
-        // Show success message with invoice link
-        Get.snackbar(
-          "Order Success",
-          "Your order #$orderId has been placed successfully!",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          duration: const Duration(seconds: 10),
-          mainButton: TextButton(
-            onPressed: () => Get.to(() => InvoiceScreen(orderId: orderId)),
-            child: const Text(
-              "VIEW INVOICE",
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        if (isCod) {
+          final bookAmount = (orderData['amount'] ?? 0) is int
+              ? (orderData['amount'] as int).toDouble()
+              : double.tryParse(orderData['amount'].toString()) ?? 0.0;
+          Get.snackbar(
+            "Order Confirmed (Cash on Delivery)",
+            "Delivery charge ${amountPaid.toInt()}tk paid via bKash ✓\n"
+                "Book amount due on delivery: ${bookAmount.toInt()}tk",
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 12),
+            mainButton: TextButton(
+              onPressed: () => Get.to(() => InvoiceScreen(orderId: orderId)),
+              child: const Text("VIEW INVOICE",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
             ),
-          ),
-        );
+          );
+        } else {
+          Get.snackbar(
+            "Order Placed Successfully!",
+            "Your order #$orderId has been confirmed.",
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 10),
+            mainButton: TextButton(
+              onPressed: () => Get.to(() => InvoiceScreen(orderId: orderId)),
+              child: const Text("VIEW INVOICE",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          );
+        }
       }
-    } else if (status == "Failed") {
-      Get.snackbar("Payment Failed", "Please try again.");
+    } else if (status == "Failed" || status == "failure") {
+      html.window.localStorage.remove('pending_order_id');
+      html.window.localStorage.remove('pending_order_data');
+      html.window.localStorage.remove('pending_order_amount');
+      html.window.localStorage.remove('pending_is_cod');
+      Get.snackbar("Payment Failed", "Please try again.",
+          backgroundColor: Colors.red, colorText: Colors.white);
       Get.offAll(() => HomePage());
-    } else if (status == "Cancelled") {
+    } else if (status == "Cancelled" || status == "cancel") {
+      html.window.localStorage.remove('pending_order_id');
+      html.window.localStorage.remove('pending_order_data');
+      html.window.localStorage.remove('pending_order_amount');
+      html.window.localStorage.remove('pending_is_cod');
       Get.snackbar("Payment Cancelled", "You cancelled the payment.");
       Get.offAll(() => HomePage());
     }

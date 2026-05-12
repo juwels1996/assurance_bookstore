@@ -85,15 +85,15 @@ class _HomePageState extends State<HomePage> {
                               homeController
                                   .searchBooks(_searchController.text)
                                   .then((_) {
-                                    if (homeController.books.isNotEmpty) {
-                                      Get.to(() => SearchResultScreen());
-                                    } else {
-                                      Get.snackbar(
-                                        'No results found',
-                                        'Try another search',
-                                      );
-                                    }
-                                  });
+                                if (homeController.books.isNotEmpty) {
+                                  Get.to(() => SearchResultScreen());
+                                } else {
+                                  Get.snackbar(
+                                    'No results found',
+                                    'Try another search',
+                                  );
+                                }
+                              });
                             },
                           ),
                         ),
@@ -352,8 +352,8 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                           onPressed: () {
                                             Get.to(
                                               () => SubcategoryScreen(
-                                                subcategoryId: sub.id
-                                                    .toString(),
+                                                subcategoryId:
+                                                    sub.id.toString(),
                                                 subcategoryName: sub.name,
                                               ),
                                             );
@@ -407,9 +407,8 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                           children: [
                             Icon(
                               Icons.category,
-                              color:
-                                  Colors.primaries[category.id %
-                                      Colors.primaries.length],
+                              color: Colors.primaries[
+                                  category.id % Colors.primaries.length],
                             ),
                             const SizedBox(width: 8),
                             Text(
@@ -436,9 +435,8 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                 children: [
                                   Icon(
                                     Icons.star,
-                                    color:
-                                        Colors.primaries[sub.id %
-                                            Colors.primaries.length],
+                                    color: Colors.primaries[
+                                        sub.id % Colors.primaries.length],
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
