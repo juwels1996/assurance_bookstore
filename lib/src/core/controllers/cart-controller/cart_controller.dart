@@ -132,7 +132,7 @@ class CartController extends GetxController {
 
   /// Delivery charge (free if any combo)
   int get totalDeliveryCharge {
-    if (totalAmount >= 1500)
+    if (totalAmount >= 2000)
       return 0; // If only combos (no outside books) → free delivery
     final nonComboItems = cartItems.where((item) => !item.isCombo).toList();
     if (nonComboItems.isEmpty) return 0;
