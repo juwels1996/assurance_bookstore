@@ -165,7 +165,7 @@ class CartController extends GetxController {
     }
 
     if (paymentMethod.value == 'cod') {
-      totalCharge += 20;
+      totalCharge += 40;
     }
 
     return totalCharge;

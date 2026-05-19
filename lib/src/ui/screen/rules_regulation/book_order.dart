@@ -22,7 +22,6 @@ class BookOrderPolicy extends StatelessWidget {
               "নিম্নে আমাদের ডেলিভারী চার্জের তালিকা প্রদান করা হলো:",
               style: TextStyle(
                 fontFamily: "NotoSerif",
-
                 fontSize: 16,
                 height: 1.5,
               ),
@@ -51,7 +50,7 @@ class BookOrderPolicy extends StatelessWidget {
 
             // 🎁 Special Offer Section
             _buildSection("🎁 বিশেষ সুবিধা", [
-              "১৫০০ টাকা বা তার বেশি মূল্যের যেকোনো বই → ফ্রি ডেলিভারী",
+              "২০০০ টাকা বা তার বেশি মূল্যের যেকোনো বই → ফ্রি ডেলিভারী",
               "কম্বো প্যাক থেকে অর্ডার করলে → সর্বদা ফ্রি ডেলিভারী",
             ]),
 
