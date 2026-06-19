@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdfrx/pdfrx.dart';
 import 'package:readmore/readmore.dart';
-import 'dart:ui_web' as ui;
-import 'dart:html' as html;
 import '../../../core/constants/constants.dart';
 import '../../../core/controllers/book-controller/bookdetails_controller.dart';
 import '../../../core/controllers/cart-controller/cart_controller.dart';
@@ -393,14 +391,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                         GestureDetector(
                           onTap: () {
                             setState(() {
-                              // Clear existing cart items
-                              cartController.cartItems.clear();
-
-                              // Add only the selected book
                               cartController.addToCart(book);
                             });
 
-                            // Navigate to cart screen
                             Get.to(() => CartScreen());
                           },
                           child: Container(

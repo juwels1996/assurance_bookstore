@@ -23,12 +23,12 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-final homeController = Get.find<HomeController>();
-final authController = Get.find<AuthController>();
-TextEditingController _searchController = TextEditingController();
-final RxInt expandedCategoryId = (-1).obs;
-
 class _HomePageState extends State<HomePage> {
+  final homeController = Get.find<HomeController>();
+  final authController = Get.find<AuthController>();
+  final _searchController = TextEditingController();
+  final RxInt expandedCategoryId = (-1).obs;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +37,12 @@ class _HomePageState extends State<HomePage> {
       homeController.loadBanners();
       PaymentScreen.checkAndHandleCallback(context);
     });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -106,6 +112,7 @@ class _HomePageState extends State<HomePage> {
                       child: buildCategoryList(
                         homeController.homePageData.value,
                         context,
+                        expandedCategoryId: expandedCategoryId,
                       ),
                     ),
                   ],
@@ -138,8 +145,15 @@ class _HomePageState extends State<HomePage> {
 
 /// Redesigned Category + Subcategory + Banner Section
 /// Redesigned Category + Subcategory + Banner Section
-Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
+Widget buildCategoryList(
+  List<HomePageData> categories,
+  BuildContext context, {
+  RxInt? expandedCategoryId,
+}) {
   final isSmall = Responsive.isSmallScreen(context);
+  final homeCtrl = Get.find<HomeController>();
+  final authCtrl = Get.find<AuthController>();
+  final expandedId = expandedCategoryId ?? (-1).obs;
 
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,7 +169,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
             children: [
               // 👤 User Welcome
               Obx(() {
-                if (authController.isLoggedIn) {
+                if (authCtrl.isLoggedIn) {
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundColor: Colors.blue.shade100,
@@ -166,7 +180,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                       style: TextStyle(fontSize: 13, color: Colors.grey),
                     ),
                     subtitle: Text(
-                      authController.username.value,
+                      authCtrl.username.value,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   );
@@ -188,7 +202,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
               ),
 
               // Category Expansion list for large screen
-              ...homeController.homePageData.map((category) {
+              ...homeCtrl.homePageData.map((category) {
                 return ExpansionTile(
                   leading: Icon(
                     Icons.bookmark,
@@ -235,7 +249,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
             if (categoryIndex == 0) {
               return Column(
                 children: [
-                  AutoScrollBanners(banners: homeController.banners),
+                  AutoScrollBanners(banners: homeCtrl.banners),
 
                   // Row(
                   //   mainAxisAlignment: MainAxisAlignment.center,
@@ -292,7 +306,7 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                               return SizedBox.shrink();
 
                             final bool isExpanded =
-                                expandedCategoryId.value == category.id;
+                                expandedId.value == category.id;
 
                             return Column(
                               mainAxisSize: MainAxisSize.min,
@@ -301,9 +315,9 @@ Widget buildCategoryList(List<HomePageData> categories, BuildContext context) {
                                 GestureDetector(
                                   onTap: () {
                                     if (isExpanded) {
-                                      expandedCategoryId.value = -1;
+                                      expandedId.value = -1;
                                     } else {
-                                      expandedCategoryId.value = category.id;
+                                      expandedId.value = category.id;
                                     }
                                   },
                                   child: Container(

@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import '../../../core/controllers/auth/auth_controller.dart';
 import '../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../../core/controllers/checkout-controller/checkout_controller.dart';
+import '../auth/login_screen.dart';
 import '../delivery-address/order_success_screen.dart';
 import '../home/home_page.dart';
 import '../invoice_Screen.dart';
@@ -253,7 +254,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
       final token = authController.token.value;
 
       if (token.isEmpty) {
-        print("Error: User is not authenticated.");
+        Get.off(() => LoginScreen());
+        Get.snackbar('Error', 'Please login to proceed with payment.');
         return;
       }
 
@@ -288,8 +290,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
       final orderId = order['order_id'];
 
-      // Step 2: Calculate total amount including delivery charge
-      final bookAmount = order['amount'] ?? 0;
+      // Step 2: Calculate total using same logic as delivery address screen
+      final bookAmount = cartController.totalAmount;
       final deliveryCharge = cartController.totalDeliveryCharge;
 
       final isCod = cartController.paymentMethod.value == 'cod';

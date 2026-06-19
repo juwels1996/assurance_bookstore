@@ -10,6 +10,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import '../../../core/controllers/auth/auth_controller.dart';
 import '../../../core/controllers/cart-controller/cart_controller.dart';
 import '../../../core/controllers/checkout-controller/checkout_controller.dart';
 import '../../../core/models/book-details/book-details.dart';
@@ -17,6 +18,7 @@ import '../../../core/models/district_model.dart';
 import '../../../core/models/districts.dart';
 import '../../../core/models/upazilla.dart';
 import '../../../core/models/upzila_model.dart';
+import '../auth/login_screen.dart';
 import '../bkash-payment/bkash_payment_screen.dart';
 import '../invoice_Screen.dart';
 import 'order_success_screen.dart';
@@ -55,6 +57,13 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   @override
   void initState() {
     super.initState();
+    final auth = Get.find<AuthController>();
+    if (!auth.isLoggedIn) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.off(() => LoginScreen());
+      });
+      return;
+    }
     updateUpazillaList(selectedDistrictId);
     fetchSavedAddress();
   }
@@ -751,11 +760,26 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
 
     return ElevatedButton.icon(
       onPressed: () async {
+        // Validate required fields
+        if (nameController.text.trim().isEmpty) {
+          Get.snackbar('Error', 'Please enter your name.');
+          return;
+        }
+        if (phoneController.text.trim().isEmpty ||
+            phoneController.text.trim().length < 11) {
+          Get.snackbar('Error', 'Please enter a valid mobile number.');
+          return;
+        }
+        if (addressController.text.trim().isEmpty) {
+          Get.snackbar('Error', 'Please enter your street address.');
+          return;
+        }
+
         // 1. Save address if new/editing
         final addressData = {
-          'name': nameController.text,
-          'phone': phoneController.text,
-          'street': addressController.text,
+          'name': nameController.text.trim(),
+          'phone': phoneController.text.trim(),
+          'street': addressController.text.trim(),
         };
 
         if (!isAddressSaved || isEditing) {

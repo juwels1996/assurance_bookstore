@@ -2,12 +2,12 @@ import 'package:assurance_bookstore/src/core/constants/constants.dart';
 import 'package:assurance_bookstore/src/ui/screen/book-details/book-details_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
-import '../home_page.dart';
+import '../../../../core/controllers/home/home_controller.dart';
 
 class SearchResultScreen extends StatelessWidget {
+  final homeController = Get.find<HomeController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

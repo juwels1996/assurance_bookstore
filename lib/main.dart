@@ -36,11 +36,8 @@ class MyRouteObserver extends RouteObserver<PageRoute> {
 class InitialBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put<HomeController>(HomeController(), permanent: true);
-    Get.put<CartController>(CartController(), permanent: true);
-    Get.put<AuthController>(AuthController(), permanent: true);
-    Get.put<CheckoutController>(CheckoutController(), permanent: true);
-    Get.put<BookDetailsController>(BookDetailsController());
+    // Controllers are registered in main() — this is intentionally empty
+    // to avoid duplicate registration
   }
 }
 
@@ -89,10 +86,8 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           ),
 
-          home: HomePage(),
-
           initialBinding: InitialBinding(),
-          initialRoute: '/', // instead of `home`
+          initialRoute: '/',
           unknownRoute: GetPage(name: '/not-found', page: () => HomePage()),
 
           getPages: [
@@ -100,8 +95,9 @@ class MyApp extends StatelessWidget {
             GetPage(
               name: '/book/:id',
               page: () {
-                final id = Get.parameters['id']; // <-- capture dynamic id
-                return BookDetailsScreen(bookId: id!);
+                final id = Get.parameters['id'] ?? '';
+                if (id.isEmpty) return HomePage();
+                return BookDetailsScreen(bookId: id);
               },
             ),
           ],

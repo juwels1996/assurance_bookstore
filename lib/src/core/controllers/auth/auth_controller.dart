@@ -50,22 +50,21 @@ class AuthController extends GetxController {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final accessToken = data['access'] ?? data['token'];
+        final refresh = data['refresh'] ?? '';
 
-        // Save the token and email in shared preferences
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', accessToken); // Store token here
-        await prefs.setString('email', email); // Store email here
-        await prefs.setString(
-          'username',
-          email.split('@')[0],
-        ); // Store username here
+        await prefs.setString('token', accessToken);
+        await prefs.setString('email', email);
+        await prefs.setString('username', email.split('@')[0]);
+        await prefs.setString('access_token', accessToken);
+        if (refresh.isNotEmpty) {
+          await prefs.setString('refresh_token', refresh);
+        }
 
-        // Store the token and set isAuthenticated to true
-        prefs.setString('access_token', accessToken);
         username.value = email.split('@')[0];
-
-        isAuthenticated.value = true;
         token.value = accessToken;
+        refreshToken.value = refresh;
+        isAuthenticated.value = true;
 
         return true;
       } else {
@@ -99,13 +98,21 @@ class AuthController extends GetxController {
       if (response.statusCode == 201) {
         var data = json.decode(response.body);
         String accessToken = data['access'];
+        final refresh = data['refresh'] ?? '';
         final prefs = await SharedPreferences.getInstance();
 
-        prefs.setString('access_token', accessToken);
+        await prefs.setString('token', accessToken);
+        await prefs.setString('access_token', accessToken);
+        await prefs.setString('email', email);
+        await prefs.setString('username', username1);
+        if (refresh.isNotEmpty) {
+          await prefs.setString('refresh_token', refresh);
+        }
 
-        username.value = email.split('@')[0];
+        username.value = username1;
         emailname.value = email;
         token.value = accessToken;
+        refreshToken.value = refresh;
         isAuthenticated.value = true;
 
         Get.to(() => CartScreen());
@@ -142,9 +149,12 @@ class AuthController extends GetxController {
   // ✅ LOGOUT
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Clear saved credentials
+    await prefs.clear();
     token.value = '';
     refreshToken.value = '';
+    username.value = '';
+    emailname.value = '';
+    isAuthenticated.value = false;
   }
 
   // Future<void> checkAuthStatus() async {
@@ -165,15 +175,18 @@ class AuthController extends GetxController {
   Future<void> checkAuthStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final savedToken = prefs.getString('token');
+    final savedRefresh = prefs.getString('refresh_token');
 
     if (savedToken != null && savedToken.isNotEmpty) {
       token.value = savedToken;
+      refreshToken.value = savedRefresh ?? '';
+      username.value = prefs.getString('username') ?? '';
       isAuthenticated.value = true;
     } else {
       isAuthenticated.value = false;
     }
 
-    isCheckingAuth.value = false; // ✅ done checking
+    isCheckingAuth.value = false;
   }
 
   Future<void> setAuthData(

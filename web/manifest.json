@@ -1,11 +1,11 @@
 {
-    "name": "Assurance Publication",
-    "short_name": "Assurance Publication",
+    "name": "Assurance Publications",
+    "short_name": "Assurance Publications",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Discover and read the best books at Assurance Publication.",
+    "description": "বিসিএস, প্রাথমিক শিক্ষক নিয়োগ, NTRCA, ব্যাংক, পুলিশ নিয়োগ, (৯-২০)তম গ্রেডসহ বিভিন্ন মন্ত্রণালয়ভিত্তিক সকল প্রতিযোগিতামূলক চাকরি প্রস্তুতির বই প্রকাশক। অ্যাসিওরেন্স পাবলিকেশন্স। আপনার চাকরি প্রস্তুতির বিশ্বস্ত সহযোগী।",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

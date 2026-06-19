@@ -104,9 +104,8 @@ class MobileAuthController extends GetxController {
           await controller.setAuthData(token, username, email);
         }
 
-        // Prefill controllers so the dialog shows current values if needed
-        authController.usernameController.text = username;
-        authController.emailController.text = email;
+        controller.usernameController.text = username;
+        controller.emailController.text = email;
 
         otpVerifyState.value = ApiState.loaded;
         _timer?.cancel();
@@ -141,13 +140,13 @@ class MobileAuthController extends GetxController {
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildInputField(
-                controller: authController.usernameController,
+                controller: this.controller.usernameController,
                 hint: "Enter a unique username",
                 label: "Enter Username",
                 icon: Icons.person,
               ),
               _buildInputField(
-                controller: authController.emailController,
+                controller: this.controller.emailController,
                 label: "Enter Email",
                 icon: Icons.email,
                 hint: "Enter a valid email address",
@@ -177,8 +176,8 @@ class MobileAuthController extends GetxController {
   }
 
   Future<bool> _updateProfile() async {
-    final newUsername = authController.usernameController.text.trim();
-    final newEmail = authController.emailController.text.trim();
+    final newUsername = controller.usernameController.text.trim();
+    final newEmail = controller.emailController.text.trim();
 
     if (newUsername.isEmpty || newEmail.isEmpty) {
       Fluttertoast.showToast(msg: "All fields are required!");
@@ -193,8 +192,8 @@ class MobileAuthController extends GetxController {
     }
 
     try {
-      await authController.checkAuthStatus();
-      final savedToken = authController.token.value;
+      await controller.checkAuthStatus();
+      final savedToken = controller.token.value;
       if (savedToken.isEmpty) {
         Fluttertoast.showToast(msg: "No token found. Please log in again.");
         return false;
