@@ -373,7 +373,7 @@ class _CartScreenState extends State<CartScreen> {
                                 fontWeight: FontWeight.bold, fontSize: 18),
                           ),
                           const SizedBox(height: 12),
-                          Builder(builder: (context) {
+                          Obx(() {
                             final codAllowed = cartController.isCodAllowed;
                             if (!codAllowed && cartController.paymentMethod.value == 'cod') {
                               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -421,8 +421,8 @@ class _CartScreenState extends State<CartScreen> {
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Text(
                                     cartController.hasCombo
-                                        ? "Combo package e Cash on Delivery available noy. Full payment korte hobe."
-                                        : "2000 Tk er upore order e Cash on Delivery available noy. Delivery Free! Full payment korte hobe.",
+                                        ? "কম্বো প্যাকেজে ক্যাশ অন ডেলিভারি প্রযোজ্য নয়। ফুল টাকা পেমেন্ট করতে হবে।"
+                                        : "২০০০ টাকার উপরে অর্ডারে ক্যাশ অন ডেলিভারি প্রযোজ্য নয়। ডেলিভারি ফ্রি! ফুল টাকা পেমেন্ট করতে হবে।",
                                     style: TextStyle(
                                         color: Colors.orange.shade800,
                                         fontSize: 13,
