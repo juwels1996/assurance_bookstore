@@ -373,7 +373,14 @@ class _CartScreenState extends State<CartScreen> {
                                 fontWeight: FontWeight.bold, fontSize: 18),
                           ),
                           const SizedBox(height: 12),
-                          Column(
+                          Builder(builder: (context) {
+                            final codAllowed = cartController.isCodAllowed;
+                            if (!codAllowed && cartController.paymentMethod.value == 'cod') {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                cartController.paymentMethod.value = 'bkash';
+                              });
+                            }
+                            return Column(
                             children: [
                               _buildModernDeliveryOption(
                                 title: "Courier / Office",
@@ -396,6 +403,7 @@ class _CartScreenState extends State<CartScreen> {
                                 onTap: (val) =>
                                     cartController.paymentMethod.value = val,
                               ),
+                              if (codAllowed) ...[
                               const SizedBox(height: 10),
                               _buildModernDeliveryOption(
                                 title: "Cash on Delivery",
@@ -407,8 +415,23 @@ class _CartScreenState extends State<CartScreen> {
                                 onTap: (val) =>
                                     cartController.paymentMethod.value = val,
                               ),
+                              ],
+                              if (!codAllowed)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    cartController.hasCombo
+                                        ? "Combo package e Cash on Delivery available noy. Full payment korte hobe."
+                                        : "2000 Tk er upore order e Cash on Delivery available noy. Delivery Free! Full payment korte hobe.",
+                                    style: TextStyle(
+                                        color: Colors.orange.shade800,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
                             ],
-                          ),
+                          );
+                          }),
                         ],
                       ),
                     ),

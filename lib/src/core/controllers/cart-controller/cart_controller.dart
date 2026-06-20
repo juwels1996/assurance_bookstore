@@ -111,6 +111,10 @@ class CartController extends GetxController {
   /// Clear cart
   void clearCart() => cartItems.clear();
 
+  bool get hasCombo => cartItems.any((item) => item.isCombo);
+
+  bool get isCodAllowed => !hasCombo && totalAmount < 2000;
+
   /// Total amount (supports combo)
   int get totalAmount => cartItems.fold(0, (sum, cartItem) {
         if (cartItem.isCombo) {
